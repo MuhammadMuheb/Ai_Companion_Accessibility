@@ -1,4 +1,4 @@
-"""Tests for MD's newer parts: naming, microphone switching, voice print gate, calls,
+"""Tests for Lyra's assistant features: naming, microphone switching, voice print gate, calls,
 lock-screen limits, self-diagnosis, expert budget, pointer safety, winget parsing."""
 
 from __future__ import annotations
@@ -25,8 +25,8 @@ def cfg(monkeypatch):
 
 def test_wake_phrases_follow_assistant_name(cfg, monkeypatch):
     monkeypatch.setattr(cfg.voice, "wake_phrases", [])
-    monkeypatch.setattr(cfg.assistant, "name", "MD")
-    assert cfg.wake_phrases == ["hey md", "md"]
+    monkeypatch.setattr(cfg.assistant, "name", "Lyra")
+    assert cfg.wake_phrases == ["hey lyra", "lyra"]
     monkeypatch.setattr(cfg.assistant, "name", "Zoya")
     assert cfg.wake_phrases == ["hey zoya", "zoya"]
     monkeypatch.setattr(cfg.voice, "wake_phrases", ["oye dost"])
@@ -188,7 +188,7 @@ def test_wake_gate_accepts_owner_and_combines_short_wake(vp, monkeypatch):
     monkeypatch.setattr(vp, "speech_seconds", lambda audio: len(audio) / 16000)
     voice = FakeVoice(heard=("what time is it", clip(0)))
     services = make_services(voice)
-    services.handle_wake("", clip(0)[:8000])          # "Hey MD" alone: 0.5 s
+    services.handle_wake("", clip(0)[:8000])          # "Hey Lyra" alone: 0.5 s
     assert voice.said[0] in ("Ji?", "Haan ji, boliye.", "Yes?")
     assert services.commands == ["what time is it"]
 
@@ -403,7 +403,7 @@ def test_wake_listener_thread_dispatches_command(monkeypatch, cfg):
     from app.voice.wake import WakeListener
 
     monkeypatch.setattr(cfg.voice, "wake_phrases", [])
-    monkeypatch.setattr(cfg.assistant, "name", "MD")
+    monkeypatch.setattr(cfg.assistant, "name", "Lyra")
     clips = iter([np.ones(16000, dtype=np.float32)])
 
     class FakeListener:
@@ -418,7 +418,7 @@ def test_wake_listener_thread_dispatches_command(monkeypatch, cfg):
                 return np.zeros(0, dtype=np.float32)
 
         def transcribe(self, audio):
-            return "Hey MD, what time is it?"
+            return "Hey Lyra, what time is it?"
 
     got, done = [], threading.Event()
     listener = WakeListener(FakeListener(), lambda rest, audio: (got.append(rest), done.set()))

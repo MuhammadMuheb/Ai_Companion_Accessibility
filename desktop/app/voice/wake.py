@@ -31,6 +31,14 @@ def normalize(text: str) -> str:
     return re.sub(r"\s+", " ", re.sub(r"[^\w\s]", " ", (text or "").lower())).strip()
 
 
+def sounds(text: str) -> str:
+    """Spelling with similar sounds merged but vowels kept: 'Lira' and 'Lyra' become the same."""
+    t = normalize(text).replace(" ", "")
+    for a, b in _SOUNDS:
+        t = t.replace(a, b)
+    return t
+
+
 def skeleton(text: str) -> str:
     """Rough phonetic key: similar sounds merged, vowels dropped (except a leading one), repeats collapsed."""
     t = normalize(text).replace(" ", "")
@@ -59,6 +67,8 @@ def edit_similarity(a: str, b: str) -> float:
 
 def similarity(a: str, b: str) -> float:
     plain = edit_similarity(normalize(a), normalize(b))
+    # same letters once look-alike sounds are merged ("Lira" / "Lyra"), a little below an exact match
+    voiced = edit_similarity(sounds(a), sounds(b)) - 0.03
     sa, sb = skeleton(a), skeleton(b)
     if not sa or not sb:
         return plain
@@ -68,7 +78,7 @@ def similarity(a: str, b: str) -> float:
         sound = 0.8 + 0.1 * plain if plain >= 0.72 else plain  # "company" also reduces to "kmpn"
     else:
         sound = SequenceMatcher(None, sa, sb).ratio() - 0.15
-    return max(plain, sound)
+    return max(plain, sound, voiced)
 
 
 FILLERS = {"hey", "hi", "hello", "ok", "okay", "oye", "oy", "ae", "ay", "arey", "arre", "yaar", "o"}
@@ -86,7 +96,7 @@ def threshold_for(phrase: str, sensitivity: float) -> float:
     return min(0.97, sensitivity + max(0, 6 - letters) * 0.03)
 
 
-# How letters sound when a name is an initialism ("MD" is heard as "M.D.", "Em Dee", "Emdee")
+# How letters sound when a name is an initialism ("AJ" is heard as "A.J.", "Ay Jay", "Ayjay")
 LETTER_NAMES = {
     "a": ["a", "ay", "eh"], "b": ["b", "bee", "be"], "c": ["c", "see", "cee", "si"], "d": ["d", "dee", "di", "de"],
     "e": ["e", "ee"], "f": ["f", "ef"], "g": ["g", "gee", "ji"], "h": ["h", "aitch", "ech"], "i": ["i", "eye", "ai"],
@@ -98,7 +108,7 @@ LETTER_NAMES = {
 
 
 def _initialisms(phrases: list[str]) -> dict[str, str]:
-    """Spoken spellings of short initialism names -> the name: {'emdee': 'md', 'em': ...}."""
+    """Spoken spellings of short initialism names -> the name: {'ayjay': 'aj', 'ajay': ...}."""
     from itertools import product
 
     spelled: dict[str, str] = {}
@@ -111,7 +121,7 @@ def _initialisms(phrases: list[str]) -> dict[str, str]:
 
 
 def _merge_spelled(original: list[str], tokens: list[str], spelled: dict[str, str]) -> tuple[list[str], list[str]]:
-    """Join 'm d' / 'em dee' / 'emdee' into 'md' so short initialism names can be matched."""
+    """Join 'a j' / 'ay jay' / 'ayjay' into 'aj' so short initialism names can be matched."""
     out_orig, out_tok, i = [], [], 0
     while i < len(tokens):
         joined = None
@@ -133,7 +143,7 @@ def _merge_spelled(original: list[str], tokens: list[str], spelled: dict[str, st
 
 def find_wake(transcript: str, phrases: list[str], sensitivity: float = 0.82) -> tuple[str, str] | None:
     """If `transcript` contains a wake phrase near its start, return (phrase, rest of the sentence)."""
-    # "M.D." -> "M D" so the letters become separate words that can be joined back together
+    # "A.J." -> "A J" so the letters become separate words that can be joined back together
     original = re.sub(r"\b([A-Za-z])\.(?=\s*[A-Za-z]\b)", r"\1 ", transcript).split()
     tokens = [normalize(w) for w in original]
     keep = [i for i, t in enumerate(tokens) if t]
@@ -189,9 +199,19 @@ class WakeListener(threading.Thread):
     # control -----------------------------------------------------------------
     def stop(self) -> None:
         self._stop.set()
+        self._drain()
+        try:
+            self.listener._close_mic()
+        except Exception as e:
+            log.debug("Failed to close mic on stop: %s", e)
 
     def pause(self) -> None:
         self._paused.set()
+        self._drain()
+        try:
+            self.listener._close_mic()
+        except Exception as e:
+            log.debug("Failed to close mic on pause: %s", e)
 
     def resume(self) -> None:
         self._drain()
@@ -224,15 +244,37 @@ class WakeListener(threading.Thread):
 
     # threads ---------------------------------------------------------------------
     def _record_loop(self) -> None:
+        import threading
         failures = 0
         while not self._stop.is_set():
             if self._paused.is_set():
                 self._stop.wait(0.2)
-                continue
-            try:
-                audio = self.listener.record(require_speech=True, wait_seconds=5, max_seconds=10, silence_seconds=0.8)
                 failures = 0
-            except Exception as e:  # device unplugged, mic access turned off, etc. — retry, slower each time
+                continue
+            record_thread = None
+            result_holder = {"audio": None, "error": None}
+            try:
+                def record_with_timeout():
+                    try:
+                        result_holder["audio"] = self.listener.record(
+                            require_speech=True, wait_seconds=5, max_seconds=10, silence_seconds=0.8)
+                    except Exception as e:
+                        result_holder["error"] = e
+                record_thread = threading.Thread(target=record_with_timeout, daemon=False, name="wake-record-timeout")
+                record_thread.start()
+                record_thread.join(timeout=15)
+                if record_thread.is_alive():
+                    log.critical("Microphone read hung for >15s; forcing restart of audio stream")
+                    self.listener._close_mic()
+                    record_thread.join(timeout=2)
+                    failures += 1
+                    self._stop.wait(min(30, 2 * failures))
+                    continue
+                if result_holder["error"]:
+                    raise result_holder["error"]
+                audio = result_holder["audio"]
+                failures = 0
+            except Exception as e:
                 failures += 1
                 if failures == 1 or failures % 30 == 0:
                     hint = (" — Windows is blocking the microphone: Settings > Privacy & security > Microphone "
@@ -240,7 +282,10 @@ class WakeListener(threading.Thread):
                     log.warning("Wake recorder error (%d in a row): %s%s", failures, e, hint)
                 self._stop.wait(min(30, 2 * failures))
                 continue
-            if audio.size and not self._paused.is_set():
+            finally:
+                if record_thread and record_thread.is_alive():
+                    record_thread.join(timeout=1)
+            if audio and audio.size and not self._paused.is_set():
                 try:
                     self._clips.put(audio, timeout=1)
                 except queue.Full:

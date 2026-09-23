@@ -5,7 +5,7 @@ from __future__ import annotations
 import ctypes
 import threading
 
-in_call = threading.Event()   # set while a call is using the microphone — MD stays silent
+in_call = threading.Event()   # set while a call is using the microphone — Lyra stays silent
 
 
 def screen_locked() -> bool:

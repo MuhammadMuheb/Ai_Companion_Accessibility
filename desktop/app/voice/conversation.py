@@ -13,7 +13,7 @@ GOODBYES = re.compile(
     r"(?:we'?re|i'?m) done|stop(?: talking)?|goodnight|good night|see you|"
     r"bas(?: karo| kar do| hai| itna hi)?|kuch nahi?|aur kuch nahi?|allah hafiz|khuda hafiz|shukriya bas|"
     r"chalo bas|jao|theek hai bas)"
-    r"(?:,? (?:thanks?|thank you|shukriya|md|md))*$")
+    r"(?:,? (?:thanks?|thank you|shukriya))*$")
 
 
 def _clean(text: str) -> str:
@@ -21,7 +21,18 @@ def _clean(text: str) -> str:
 
 
 def is_goodbye(text: str) -> bool:
-    return bool(GOODBYES.match(re.sub(r"\s+", " ", _clean(text))))
+    from app.config import get_config
+
+    t = re.sub(r"\s+", " ", _clean(text))
+    # "bye Lyra", "Khuda hafiz Lyra, shukriya": the assistant's own name doesn't change the meaning
+    for name in {get_config().assistant.name.lower(), *(core_name(p) for p in get_config().wake_phrases)}:
+        if name:
+            t = re.sub(rf"(?:^| ){re.escape(name)}(?= |$)", "", t).strip()
+    return bool(GOODBYES.match(re.sub(r"\s+", " ", t)))
+
+
+def core_name(phrase: str) -> str:
+    return re.sub(r"^(?:hey|hi|hello|ok|okay|oye) ", "", phrase.lower()).strip()
 
 
 def is_gibberish(text: str) -> bool:

@@ -1,4 +1,4 @@
-"""Only one MD at a time. A second launch (double-clicking MD again, the Start-menu
+"""Only one Lyra at a time. A second launch (double-clicking Lyra again, the Start-menu
 shortcut, the startup shortcut) doesn't start a second copy — it asks the running one to
 show its window and exits. Uses Windows named kernel objects: no ports, no network."""
 
@@ -27,9 +27,9 @@ WAIT_OBJECT_0 = 0
 
 
 class SingleInstance:
-    """`with SingleInstance("MD") as inst:` — inst.primary is False if MD already runs."""
+    """`with SingleInstance("Lyra") as inst:` — inst.primary is False if Lyra already runs."""
 
-    def __init__(self, name: str = "MDCompanion"):
+    def __init__(self, name: str = "LyraAssistant"):
         self.mutex_name = f"Local\\{name}.Instance"
         self.event_name = f"Local\\{name}.ShowWindow"
         self._mutex = None

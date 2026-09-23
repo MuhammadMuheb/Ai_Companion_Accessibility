@@ -1,7 +1,7 @@
 """Long-term memory that keeps itself up to date.
 
 Facts, preferences, projects and goals are extracted from what the user says and stored in
-the local SQLite database indefinitely. Each new fact is reconciled against what MD already
+the local SQLite database indefinitely. Each new fact is reconciled against what Lyra already
 knows:
 
 - the same thing again             -> kept once (refreshed)

@@ -33,8 +33,10 @@ SAMPLE_RATE = 16_000
 DEAD_SILENCE = 1e-5          # a real mic always has some noise; exact zeros mean "not delivering"
 DEAD_SECONDS = 3.0
 DEFAULT_CHECK_SECONDS = 1.0
+READ_TIMEOUT_SECONDS = 8.0   # safety timeout: if a read doesn't complete within this, force restart
 
 _com_lock = threading.Lock()
+_FORCE_EXCLUSIVE = False     # CRITICAL: Keep False to allow coexistence with calls/meetings
 
 
 def _sc():
@@ -56,6 +58,21 @@ def default_microphone_name() -> str:
         return _sc().default_microphone().name
     except Exception:
         return ""
+
+
+def check_shared_mode() -> bool:
+    """Verify that audio can be opened in shared (non-exclusive) mode."""
+    try:
+        import soundcard
+        default = soundcard.default_microphone()
+        recorder = default.recorder(samplerate=SAMPLE_RATE, channels=1, blocksize=1600, exclusive=False)
+        recorder.__enter__()
+        recorder.__exit__(None, None, None)
+        log.info("✓ Microphone supports shared mode (non-exclusive)")
+        return True
+    except Exception as e:
+        log.warning("⚠ Microphone may not support shared mode: %s", e)
+        return False
 
 
 def _find(name: str):
@@ -99,9 +116,19 @@ class MicStream:
         return default
 
     def _open(self) -> None:
+        from app.voice.audio_guard import require_shared_mode
+
         self._close()
         mic = self._choose()
-        self._rec = mic.recorder(samplerate=SAMPLE_RATE, channels=1, blocksize=int(SAMPLE_RATE * 0.1))
+        blocksize = int(SAMPLE_RATE * 0.1)
+        require_shared_mode("mic_stream", "microphone")
+        try:
+            self._rec = mic.recorder(samplerate=SAMPLE_RATE, channels=1, blocksize=blocksize,
+                                     exclusive=not _FORCE_EXCLUSIVE)
+            log.debug("Opened microphone in %s mode", "exclusive" if _FORCE_EXCLUSIVE else "shared")
+        except TypeError:
+            log.warning("soundcard doesn't support exclusive parameter; trying without it")
+            self._rec = mic.recorder(samplerate=SAMPLE_RATE, channels=1, blocksize=blocksize)
         self._rec.__enter__()
         if self._mic is not None and mic.id != self._mic.id:
             self.switches += 1
@@ -111,12 +138,17 @@ class MicStream:
         self._last_check = time.time()
 
     def _close(self) -> None:
+        from app.voice.audio_guard import release_audio
+
         if self._rec is not None:
             try:
                 self._rec.__exit__(None, None, None)
             except Exception:
                 pass
-            self._rec = None
+            finally:
+                release_audio("mic_stream", "microphone")
+                self._rec = None
+                self._mic = None
 
     def __enter__(self) -> "MicStream":
         self._open()
@@ -142,7 +174,39 @@ class MicStream:
         for attempt in range(5):
             try:
                 self._maybe_follow_default()
-                data = self._rec.record(numframes=frames)
+                read_result = {"data": None, "error": None, "done": False}
+                read_event = threading.Event()
+
+                def do_read():
+                    try:
+                        read_result["data"] = self._rec.record(numframes=frames)
+                        read_result["done"] = True
+                    except Exception as e:
+                        read_result["error"] = e
+                    finally:
+                        read_event.set()
+
+                read_thread = threading.Thread(target=do_read, daemon=True)
+                read_thread.start()
+                if not read_event.wait(timeout=READ_TIMEOUT_SECONDS):
+                    log.critical("Microphone read timeout after %.1fs; forcing restart", READ_TIMEOUT_SECONDS)
+                    self._close()
+                    time.sleep(0.5)
+                    try:
+                        self._open()
+                    except Exception as e2:
+                        log.warning("Reopen after timeout failed: %s", e2)
+                    read_thread.join(timeout=0.5)
+                    return np.zeros(frames, dtype=np.float32)
+
+                if read_result["error"]:
+                    raise read_result["error"]
+                if not read_result["done"]:
+                    log.warning("Microphone read incomplete; trying again")
+                    time.sleep(0.3)
+                    continue
+
+                data = read_result["data"]
                 block = data[:, 0] if data.ndim == 2 else data
                 if block.size < frames:
                     block = np.pad(block, (0, frames - block.size))
@@ -155,7 +219,7 @@ class MicStream:
                 else:
                     self._silent_blocks = 0
                 return block.astype(np.float32)
-            except Exception as e:  # device unplugged / Bluetooth profile change
+            except Exception as e:
                 log.warning("Microphone read failed (%s); reopening", e)
                 time.sleep(0.3 * (attempt + 1))
                 try:

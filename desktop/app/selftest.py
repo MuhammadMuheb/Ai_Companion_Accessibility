@@ -1,6 +1,6 @@
-"""`MD.exe --selftest`: load every part that needs native code or bundled files, write the result to
+"""`Lyra.exe --selftest`: load every part that needs native code or bundled files, write the result to
 data/logs/selftest.json and exit — without starting the tray, the microphone loop or speaking.
-Used to check a build (and by support: "run MD.exe --selftest and send me the file")."""
+Used to check a build (and by support: "run Lyra.exe --selftest and send me the file")."""
 
 from __future__ import annotations
 
@@ -53,6 +53,19 @@ def run() -> int:
         engine.stop()
         return {"voices": len(voices)}
 
+    def neural_voice():
+        # load the bundled default voice and synthesise one word (no sound is played)
+        from piper import PiperVoice
+
+        from app.voice.voices import DEFAULT_VOICE, get_voice, model_files
+
+        files = model_files(get_voice(DEFAULT_VOICE))
+        if files is None:
+            raise FileNotFoundError("default voice not bundled")
+        voice = PiperVoice.load(str(files[0]), config_path=str(files[1]))
+        samples = sum(len(c.audio_float_array) for c in voice.synthesize("Hello."))
+        return {"voice": files[0].name, "samples": samples}
+
     def ocr():
         import winrt.windows.media.ocr as wocr
 
@@ -87,7 +100,7 @@ def run() -> int:
         return {"assistant": cfg.assistant.name, "wake": cfg.wake_phrases}
 
     for name, fn in [("config", config), ("whisper_tiny", whisper("tiny")), ("whisper_base", whisper("base")),
-                     ("voiceprint", voiceprint), ("tts", tts), ("ocr", ocr), ("microphones", mics),
+                     ("voiceprint", voiceprint), ("tts", tts), ("neural_voice", neural_voice), ("ocr", ocr), ("microphones", mics),
                      ("webview", webview), ("tray", tray), ("window_api", api)]:
         _check(results, name, fn)
 

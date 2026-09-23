@@ -1,4 +1,4 @@
-"""Small on-screen UI drawn by MD itself: a corner pop-up with buttons, and a coloured
+"""Small on-screen UI drawn by Lyra itself: a corner pop-up with buttons, and a coloured
 frame that highlights part of the screen. Runs one Tk event loop on its own thread; all
 calls from other threads are queued onto it."""
 

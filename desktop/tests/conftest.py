@@ -2,7 +2,7 @@
 
 Before any test runs, every storage path (memory database, logs, activity log, call recordings,
 voice prints, screenshots, code output, settings overrides) is pointed at a temporary folder, so
-running the test suite never writes into data/ — which MD's own "diagnose yourself" reads.
+running the test suite never writes into data/ — which Lyra's own "diagnose yourself" reads.
 """
 
 from __future__ import annotations
@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 
-_TMP = Path(tempfile.mkdtemp(prefix="md-tests-"))
+_TMP = Path(tempfile.mkdtemp(prefix="lyra-tests-"))
 
 
 def pytest_configure(config):

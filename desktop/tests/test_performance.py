@@ -63,14 +63,14 @@ def spot(listener):
 
 
 def test_full_model_skipped_when_no_wake_word(monkeypatch):
-    monkeypatch.setattr(wake, "get_config", lambda: type("C", (), {"wake_phrases": ["hey md", "md"]})())
+    monkeypatch.setattr(wake, "get_config", lambda: type("C", (), {"wake_phrases": ["hey lyra", "lyra"]})())
     listener = FakeListener("we are talking about dinner", "unused")
     hit, _ = spot(listener)
     assert hit is None and listener.full_calls == 0
 
 
 def test_full_model_reads_the_command_after_the_wake_word(monkeypatch):
-    monkeypatch.setattr(wake, "get_config", lambda: type("C", (), {"wake_phrases": ["hey md", "md"]})())
-    listener = FakeListener("hey md open", "Hey MD, open YouTube")
+    monkeypatch.setattr(wake, "get_config", lambda: type("C", (), {"wake_phrases": ["hey lyra", "lyra"]})())
+    listener = FakeListener("hey lyra open", "Hey Lyra, open YouTube")
     hit, text = spot(listener)
     assert hit is not None and "youtube" in hit[1].lower() and listener.full_calls == 1

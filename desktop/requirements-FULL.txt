@@ -6,7 +6,8 @@ soundcard>=0.4           # microphone that follows AirPods/earbuds switching; ca
 onnxruntime>=1.18        # voice print (speaker verification)
 kaldi-native-fbank>=1.20
 faster-whisper>=1.1
-pyttsx3>=2.98
+pyttsx3>=2.98             # Windows built-in voices (Zira, David)
+piper-tts>=1.3           # neural voices (Amy, Kristin, Jenny, Ryan …) — offline, downloaded on demand
 sounddevice>=0.5
 soundfile>=0.12
 numpy

@@ -12,28 +12,46 @@ from app.command_parser import parse
 from app.config import get_config
 from app.voice.wake import find_wake
 
-MD = ["hey md", "md"]
+# a user may name the assistant with an initialism ("AJ"); it is heard as "A.J.", "Ay Jay", "Ayjay"
+AJ = ["hey aj", "aj"]
+LYRA = ["hey lyra", "lyra"]
 
 
 @pytest.mark.parametrize("said, rest", [
-    ("Hello MD, what time is it?", "what time is it"),
-    ("Hello M.D. open YouTube", "open YouTube"),
-    ("Hello Em Dee what time is it", "what time is it"),
-    ("Emdee open notepad", "open notepad"),
-    ("Hi MD", ""),
+    ("Hello AJ, what time is it?", "what time is it"),
+    ("Hello A.J. open YouTube", "open YouTube"),
+    ("Hello Ay Jay what time is it", "what time is it"),
+    ("Ayjay open notepad", "open notepad"),
+    ("Hi AJ", ""),
 ])
 def test_initialism_wake_name(said, rest):
-    assert find_wake(said, MD)[1] == rest
+    assert find_wake(said, AJ)[1] == rest
 
 
-@pytest.mark.parametrize("said", ["I need to see the MD tomorrow about my back", "Em, I think so", "Mad world",
-                                  "Hey Ed", "Hello, how are you?"])
+@pytest.mark.parametrize("said", ["I need to see the AJ tomorrow about my back", "Hey Ed", "Hello, how are you?",
+                                  "Major work"])
 def test_initialism_no_false_wake(said):
-    assert find_wake(said, MD) is None
+    assert find_wake(said, AJ) is None
+
+
+@pytest.mark.parametrize("said, rest", [
+    ("Hey Lyra, what time is it?", "what time is it"),
+    ("Hello Lyra open YouTube", "open YouTube"),
+    ("Lira, namaz ka time", "namaz ka time"),
+    ("OK Lyra, what's the weather", "what's the weather"),
+])
+def test_lyra_wake_name(said, rest):
+    assert find_wake(said, LYRA)[1] == rest
+
+
+@pytest.mark.parametrize("said", ["I like lyrics in songs", "The library opens at nine", "Hey Laura, how are you?",
+                                  "Hello, how are you?", "Please pass the lira coins"])
+def test_lyra_no_false_wake(said):
+    assert find_wake(said, LYRA) is None
 
 
 @pytest.mark.parametrize("said, intent", [
-    ("your name is MD", "set_assistant_name"), ("call me Muheb", "set_user_name"),
+    ("your name is Lyra", "set_assistant_name"), ("call me Muheb", "set_user_name"),
     ("main Karachi mein rehta hoon", "set_city"), ("turn off notifications", "toggle_feature"),
     ("translation chalu karo", "toggle_feature"), ("open your settings", "show_window"),
     ("stop listening for 10 minutes", "pause_listening"), ("notepad band karo", "close_app"),
@@ -124,15 +142,15 @@ def test_app_starts_without_any_window(monkeypatch):
     from app.web import server
 
     monkeypatch.setattr(server, "get_state", lambda: SimpleNamespace(extra_hotkeys={}, services=None))
-    app = daemon.MDApp()
+    app = daemon.LyraApp()
     assert app.window is None and not app._want_window.is_set()   # nothing on screen, no WebView
     app.show("settings")                                           # first request: main thread builds it
     assert app._want_window.is_set() and app._pending_tab == "settings"
 
 
-# ---- conversation after the wake word (no need to repeat "Hello MD") ----
+# ---- conversation after the wake word (no need to repeat "Hello Lyra") ----
 @pytest.mark.parametrize("said", ["bye", "Okay, bye!", "that's all, thanks", "bas", "bas karo", "Allah Hafiz",
-                                  "theek hai, shukriya bas", "nothing else", "Khuda hafiz MD"])
+                                  "theek hai, shukriya bas", "nothing else", "Khuda hafiz Lyra"])
 def test_goodbye_ends_conversation(said):
     from app.voice.conversation import is_goodbye
 

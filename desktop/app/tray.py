@@ -1,8 +1,8 @@
-"""System-tray icon for the native MD app, plus Windows shortcuts:
+"""System-tray icon for the native Lyra app, plus Windows shortcuts:
 "Start with Windows" (Startup folder) and "Add to Start menu" — both per-user, no admin
 rights, easy to undo.
 
-While Windows is locked MD keeps running (it's a normal program in your session): it
+While Windows is locked Lyra keeps running (it's a normal program in your session): it
 still hears the wake word, reads notifications and reminders aloud and answers questions,
 but refuses anything that controls the computer until you unlock (see workflow.LOCKED_OK).
 It does not run on the sign-in screen before you log in — that would need a system service
@@ -23,33 +23,51 @@ log = get_logger(__name__)
 
 PROGRAMS = Path(os.environ.get("APPDATA", "")) / "Microsoft/Windows/Start Menu/Programs"
 STARTUP = PROGRAMS / "Startup"
-SHORTCUT = STARTUP / "MD Companion.lnk"
-START_MENU = PROGRAMS / "MD.lnk"
-LAUNCHER = ROOT / "md.pyw"
+SHORTCUT = STARTUP / "Lyra.lnk"
+START_MENU = PROGRAMS / "Lyra.lnk"
+LAUNCHER = ROOT / "lyra.pyw"
+# shortcuts made by the earlier release (before the Lyra rebrand)
+LEGACY_STARTUP = STARTUP / "MD Companion.lnk"
+LEGACY_START_MENU = PROGRAMS / "MD.lnk"
 
 
 def pythonw() -> str:
     if FROZEN:
-        return sys.executable  # MD.exe itself
+        return sys.executable  # Lyra.exe itself
     exe = Path(sys.executable)
     candidate = exe.with_name("pythonw.exe")
     return str(candidate if candidate.exists() else exe)
 
 
 def _make_shortcut(path: Path, arguments: str = "") -> str | None:
-    """Create a .lnk that runs md.pyw with pythonw (no console). Returns an error or None."""
+    """Create a .lnk that runs lyra.pyw with pythonw (no console). Returns an error or None."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    ps = ("$s = (New-Object -ComObject WScript.Shell).CreateShortcut($env:MD_LNK); "
-          "$s.TargetPath = $env:MD_EXE; $s.Arguments = $env:MD_ARGS; "
-          "$s.WorkingDirectory = $env:MD_DIR; $s.Description = 'MD AI companion'; $s.Save()")
-    # from source the shortcut runs `pythonw md.pyw`; installed, it runs MD.exe directly
+    ps = ("$s = (New-Object -ComObject WScript.Shell).CreateShortcut($env:LYRA_LNK); "
+          "$s.TargetPath = $env:LYRA_EXE; $s.Arguments = $env:LYRA_ARGS; "
+          "$s.WorkingDirectory = $env:LYRA_DIR; $s.Description = 'Lyra - voice-first AI assistant'; $s.Save()")
+    # from source the shortcut runs `pythonw lyra.pyw`; installed, it runs Lyra.exe directly
     args = arguments if FROZEN else f'"{LAUNCHER}"' + (f" {arguments}" if arguments else "")
-    env = {**os.environ, "MD_LNK": str(path), "MD_EXE": pythonw(), "MD_ARGS": args,
-           "MD_DIR": str(DATA_ROOT)}
+    env = {**os.environ, "LYRA_LNK": str(path), "LYRA_EXE": pythonw(), "LYRA_ARGS": args,
+           "LYRA_DIR": str(DATA_ROOT)}
     proc = subprocess.run(["powershell", "-NoProfile", "-Command", ps], env=env, capture_output=True, text=True)
     if proc.returncode != 0 or not path.exists():
         return proc.stderr[-200:] or "unknown error"
     return None
+
+
+def migrate_legacy_shortcuts() -> None:
+    """Replace shortcuts left by the earlier release with Lyra's own (same settings, new name)."""
+    try:
+        if LEGACY_STARTUP.exists():
+            LEGACY_STARTUP.unlink()
+            if not SHORTCUT.exists():
+                _make_shortcut(SHORTCUT)
+        if LEGACY_START_MENU.exists():
+            LEGACY_START_MENU.unlink()
+            if not START_MENU.exists():
+                _make_shortcut(START_MENU, "--show")
+    except OSError as e:
+        log.info("Couldn't update old shortcuts: %s", e)
 
 
 def autostart_enabled() -> bool:
@@ -76,35 +94,33 @@ def set_start_menu(enabled: bool) -> str:
     if not enabled:
         if START_MENU.exists():
             START_MENU.unlink()
-        return "Removed MD from the Start menu."
+        return "Removed Lyra from the Start menu."
     error = _make_shortcut(START_MENU, "--show")
-    return f"Couldn't add to the Start menu: {error}" if error else "MD is in the Start menu — search for “MD”."
+    return f"Couldn't add to the Start menu: {error}" if error else "Lyra is in the Start menu — search for “Lyra”."
 
 
 def _icon_image():
-    from PIL import Image, ImageDraw, ImageFont
+    from PIL import Image, ImageDraw
 
-    logo = ROOT / "app" / "web" / "static" / "md-logo.png"  # the MD brand mark
+    logo = ROOT / "app" / "web" / "static" / "lyra-logo.png"  # the Lyra brand mark
     if logo.exists():
         return Image.open(logo).convert("RGBA").resize((64, 64), Image.LANCZOS)
+    # fallback: the Lyra mark without its gradient (dark tile, violet orbit, star)
     img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    d.rounded_rectangle((2, 2, 62, 62), radius=16, fill=(123, 108, 255, 255))
-    try:
-        font = ImageFont.truetype("segoeuib.ttf", 26)
-    except OSError:
-        font = ImageFont.load_default()
-    d.text((32, 33), "MD", fill=(10, 11, 18), font=font, anchor="mm")
+    d.rounded_rectangle((2, 2, 62, 62), radius=16, fill=(16, 14, 32, 255))
+    d.arc((15, 16, 49, 50), start=-30, end=270, fill=(139, 123, 255, 255), width=6)
+    d.ellipse((42, 12, 50, 20), fill=(94, 234, 212, 255))
     return img
 
 
 def start_tray(app):
     """Show the tray icon (runs on its own thread; the native window owns the main thread).
-    `app` is a daemon.MDApp."""
+    `app` is a daemon.LyraApp."""
     try:
         import pystray
     except ImportError:
-        log.warning("pystray not installed; no tray icon — use Ctrl+Alt+N to open MD")
+        log.warning("pystray not installed; no tray icon — use Ctrl+Alt+N to open Lyra")
         return None
 
     def wake():
@@ -122,7 +138,7 @@ def start_tray(app):
 
     name = get_config().assistant.name
     menu = pystray.Menu(
-        pystray.MenuItem(f"Open {name}", lambda icon, item: app.show("chat"), default=True),
+        pystray.MenuItem(f"Open {name}", lambda icon, item: app.show("home"), default=True),
         pystray.MenuItem("Talk now", lambda icon, item: app.talk()),
         pystray.MenuItem("Settings", lambda icon, item: app.show("settings")),
         pystray.Menu.SEPARATOR,
@@ -135,6 +151,6 @@ def start_tray(app):
         pystray.Menu.SEPARATOR,
         pystray.MenuItem(f"Quit {name}", quit_),
     )
-    icon = pystray.Icon("md", _icon_image(), f"{name} — AI companion", menu)
+    icon = pystray.Icon("lyra", _icon_image(), f"{name} — AI companion", menu)
     icon.run_detached()
     return icon

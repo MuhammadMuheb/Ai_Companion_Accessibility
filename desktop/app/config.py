@@ -15,10 +15,13 @@ except ImportError:  # python-dotenv is optional
     load_dotenv = None
 
 ROOT = Path(__file__).resolve().parent.parent  # program files (read-only once installed)
-# Installed MD.exe lives in Program Files, which normal users can't write to, so its data goes to
-# %LOCALAPPDATA%\MD. Run from source, data stays next to the code as before.
+# The installed Lyra.exe lives in Program Files, which normal users can't write to, so its data goes
+# to %LOCALAPPDATA%\Lyra. Run from source, data stays next to the code as before.
 FROZEN = bool(getattr(sys, "frozen", False))
-DATA_ROOT = Path(os.environ.get("LOCALAPPDATA") or Path.home()) / "MD" if FROZEN else ROOT
+APP_NAME = "Lyra"
+DATA_ROOT = Path(os.environ.get("LOCALAPPDATA") or Path.home()) / APP_NAME if FROZEN else ROOT
+# Names used by earlier releases; their saved defaults are upgraded to Lyra's on load.
+LEGACY_NAMES = {"md"}
 # Settings changed from the browser UI. Kept apart from config.yaml so its comments survive;
 # applied last, so they win over config.yaml and .env.
 SETTINGS_FILE = DATA_ROOT / "data" / "settings.yaml"
@@ -45,7 +48,7 @@ class UserConfig:
 
 @dataclass
 class AssistantConfig:
-    name: str = "MD"  # what the assistant calls itself; also the default wake word
+    name: str = "Lyra"  # what the assistant calls itself; also the default wake word
 
 
 @dataclass
@@ -89,6 +92,10 @@ class VoiceConfig:
     conversation: bool = True
     follow_up_seconds: float = 6.0
     # Words Whisper should expect (spellings for Roman Urdu, names). Your name is added automatically.
+    # Speaking voice: an id from app.voice.voices (8 female + 4 male), speed and loudness
+    tts_voice: str = "amy"
+    tts_rate: float = 1.0      # 0.7 = slower .. 1.4 = faster
+    tts_volume: float = 1.0    # 0.2 .. 1.0
     hint: str = ("Assalam-o-Alaikum. Roman Urdu and English: namaz, kholo, band karo, awaaz kam karo, "
                  "yaad dilao, kitne baje hain, theek hai, shukriya, Allah Hafiz.")
 
@@ -126,7 +133,7 @@ class HotkeysConfig:
     enabled: bool = True
     translate: str = "<ctrl>+<alt>+t"   # translate selected text / text under the mouse
     talk: str = "<ctrl>+<alt>+<space>"  # start listening without the wake word
-    open_window: str = "<ctrl>+<alt>+n"  # open MD's chat window
+    open_window: str = "<ctrl>+<alt>+n"  # open Lyra's window
 
 
 @dataclass
@@ -191,7 +198,7 @@ class Config:
         phrases = [p.strip() for p in (self.voice.wake_phrases or []) if str(p).strip()]
         if phrases:
             return phrases
-        name = (self.assistant.name or "MD").strip()
+        name = (self.assistant.name or APP_NAME).strip()
         return [f"hey {name}".lower(), name.lower()]
 
     def path(self, relative: str) -> Path:
@@ -243,10 +250,24 @@ def _apply_env(cfg: Config) -> None:
     cfg.log_level = env("LOG_LEVEL", cfg.log_level)
 
 
+def _upgrade_legacy(data: dict) -> dict:
+    """Settings saved by the earlier "MD" release kept its old name as the assistant name and wake
+    phrases; drop those so Lyra's own name (and wake word) apply. A custom name is kept."""
+    assistant = data.get("assistant") or {}
+    if str(assistant.get("name", "")).strip().lower() in LEGACY_NAMES:
+        assistant.pop("name")
+    voice = data.get("voice") or {}
+    phrases = voice.get("wake_phrases")
+    if isinstance(phrases, list) and phrases and all(
+            str(p).lower().replace("hey ", "").replace("hello ", "").strip() in LEGACY_NAMES for p in phrases):
+        voice.pop("wake_phrases")
+    return data
+
+
 def _apply_file(cfg: Config, path: Path) -> None:
     if not path.exists():
         return
-    data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    data = _upgrade_legacy(yaml.safe_load(path.read_text(encoding="utf-8")) or {})
     for name in SECTIONS:
         _apply(getattr(cfg, name), data.get(name, {}))
     for key in MAPPINGS:

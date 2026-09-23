@@ -28,7 +28,7 @@ MODEL_REPO = "Wespeaker/wespeaker-voxceleb-resnet34-LM"
 MODEL_FILE = "voxceleb_resnet34_LM.onnx"
 MAX_PROFILES = 2
 SAMPLE_RATE = 16_000
-MIN_SECONDS = 1.0  # shorter clips ("Hey MD" alone) are not reliable; combine with the command
+MIN_SECONDS = 1.0  # shorter clips ("Hey Lyra" alone) are not reliable; combine with the command
 
 
 class VoiceprintError(RuntimeError):

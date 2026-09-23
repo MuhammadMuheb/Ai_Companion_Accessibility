@@ -1,19 +1,19 @@
-"""MD as a headless Windows background app — no web server, no browser, no terminal,
+"""Lyra as a headless Windows background app — no web server, no browser, no terminal,
 and no window unless you ask for one.
 
 One process holds everything: the companion, scheduler, voice (wake word, speech), the
-background services (notifications, calls, hotkeys, watchdog) and a system-tray icon. MD
-starts invisible and is used by voice ("Hello MD ..."). Its window (chat, settings, commands,
-accounts, memory) is only created the first time you open it from the tray, with Ctrl+Alt+N, or
-by launching MD again — until then not even the WebView is loaded.
+background services (notifications, calls, hotkeys, watchdog) and a system-tray icon. Lyra
+starts invisible and is used by voice ("Hello Lyra ..."). Its window (voice home, voice gallery,
+routines, accounts, memory, settings) is only created the first time you open it from the tray, with Ctrl+Alt+N, or
+by launching Lyra again — until then not even the WebView is loaded.
 
 The window is a WebView2 control (the Windows component WhatsApp Desktop and Teams use), so it
 works with screen readers such as Narrator and NVDA. It is *not* a browser tab and nothing
-listens on the network: the page calls MD's functions directly inside this process (the API
+listens on the network: the page calls Lyra's functions directly inside this process (the API
 routes are invoked in-process, without any socket or port).
 
-Start: `md.pyw` (double-click, no console), the Start-menu / startup shortcut, or `python main.py`.
-Launching MD again while it runs just brings its window to the front.
+Start: `lyra.pyw` (double-click, no console), the Start-menu / startup shortcut, or `python main.py`.
+Launching Lyra again while it runs just brings its window to the front.
 """
 
 from __future__ import annotations
@@ -71,11 +71,11 @@ def page_html() -> str:
     js = (STATIC / "app.js").read_text(encoding="utf-8")
     html = html.replace('<link rel="stylesheet" href="/static/style.css">', f"<style>\n{css}\n</style>")
     html = html.replace('<script src="/static/app.js"></script>',
-                        f"<script>window.MD_NATIVE = true;</script>\n<script>\n{js}\n</script>")
+                        f"<script>window.LYRA_NATIVE = true;</script>\n<script>\n{js}\n</script>")
     return html
 
 
-class MDApp:
+class LyraApp:
     def __init__(self):
         from app.web import server
 
@@ -88,7 +88,7 @@ class MDApp:
 
     # ---- window (created on first use) ------------------------------------------------------
     def show(self, tab: str | None = None) -> None:
-        """Open MD's window — from the tray, Ctrl+Alt+N, a second launch, or a voice command."""
+        """Open Lyra's window — from the tray, Ctrl+Alt+N, a second launch, or a voice command."""
         if self.window is None:
             self._pending_tab = tab
             self._want_window.set()      # the main thread creates the window
@@ -98,17 +98,17 @@ class MDApp:
         self.window.on_top = True
         self.window.on_top = False
         if tab:
-            self.window.evaluate_js(f"selectTab(document.getElementById('tab-{tab}'))")
+            self.window.evaluate_js(f"window.lyraShow && window.lyraShow({tab!r})")
 
     def _on_closing(self):
         if self._quitting:
             return True
-        self.window.hide()   # closing the window keeps MD running invisibly
+        self.window.hide()   # closing the window keeps Lyra running invisibly
         return False
 
     def _on_loaded(self):
         if self._pending_tab:
-            self.window.evaluate_js(f"selectTab(document.getElementById('tab-{self._pending_tab}'))")
+            self.window.evaluate_js(f"window.lyraShow && window.lyraShow({self._pending_tab!r})")
             self._pending_tab = None
 
     def run_ui_when_needed(self) -> None:
@@ -119,17 +119,17 @@ class MDApp:
             if self._quitting:
                 return
         name = get_config().assistant.name
-        self.window = webview.create_window(name, html=page_html(), js_api=Bridge(), width=940, height=780,
-                                            min_size=(480, 420), text_select=True)
+        self.window = webview.create_window(name, html=page_html(), js_api=Bridge(), width=1120, height=780,
+                                            min_size=(560, 520), text_select=True, background_color="#0B0D12")
         self.window.events.closing += self._on_closing
         self.window.events.loaded += self._on_loaded
-        storage = get_config().dir("data/webview")  # remembers the page's own preferences (voice, tab)
-        log.info("Opening MD's window")
+        storage = get_config().dir("data/webview")  # remembers the page's own preferences (theme, page)
+        log.info("Opening Lyra's window")
         webview.start(gui="edgechromium", private_mode=False, storage_path=str(storage))
 
     # ---- lifecycle -------------------------------------------------------------------------------
     def start_background(self) -> None:
-        threading.Thread(target=self.state.start_background, daemon=True, name="md-start").start()
+        threading.Thread(target=self.state.start_background, daemon=True, name="lyra-start").start()
 
     def talk(self) -> None:
         services = self.state.services
@@ -143,7 +143,7 @@ class MDApp:
                 self.state.services.stop()
             self.state.scheduler.shutdown()
         finally:
-            log.info("MD stopped from the tray")
+            log.info("Lyra stopped from the tray")
             os._exit(0)
 
 
@@ -156,15 +156,18 @@ def run(show_window: bool = False) -> int:
     with SingleInstance() as instance:
         if not instance.primary:
             instance.signal_running()  # already running: bring its window up and leave
-            log.info("MD already running; asked it to show its window")
+            log.info("Lyra already running; asked it to show its window")
             return 0
         make_dpi_aware()
         _enable_crash_log()
-        app = MDApp()
+        from app.tray import migrate_legacy_shortcuts
+
+        migrate_legacy_shortcuts()
+        app = LyraApp()
         app.start_background()
-        instance.on_show_request(app.show)   # launching MD again = "show me the window"
+        instance.on_show_request(app.show)   # launching Lyra again = "show me the window"
         start_tray(app)
-        log.info("MD running invisibly in the background (no window, no server)")
+        log.info("Lyra running invisibly in the background (no window, no server)")
         if show_window:
             app.show()
         app.run_ui_when_needed()

@@ -1,4 +1,4 @@
-# AI Companion Configuration
+# Lyra — voice-first AI assistant: configuration
 
 user:
   name: "User"
@@ -9,7 +9,7 @@ user:
   longitude: null
 
 assistant:
-  name: "MD"             # change it and the wake word follows ("hey <name>", "<name>")
+  name: "Lyra"             # change it and the wake word follows ("hey <name>", "<name>")
 
 llm:
   ollama_url: "http://localhost:11434"
@@ -31,6 +31,11 @@ voice:
   stt_model_size: "base"   # tiny | base | small | medium — understands your commands
   wake_model_size: "tiny"  # listens for the wake word all day; keep it light so replies stay fast
   tts_engine: "pyttsx3"
+  # Speaking voice (Settings → Voice): amy, kristin, lessac, harper, jenny, cori, alba, zira (female);
+  # ryan, alan, joe, david (male). Neural voices download once (~63 MB); zira/david are built into Windows.
+  tts_voice: "amy"
+  tts_rate: 1.0            # 0.5 .. 2.0
+  tts_volume: 1.0          # 0.1 .. 1.0
   language: "en"           # speech language hint for Whisper ("en", "ur", "hi"; "" = auto-detect)
   input_device: null       # microphone: null = Windows default, or a number/name from --mic-test
   # Wake word: say one of these to talk without pressing anything. Pick a name that isn't an
@@ -54,7 +59,7 @@ hotkeys:
   enabled: true
   translate: "<ctrl>+<alt>+t"     # translate selected text, or the text under the mouse, into Roman Urdu
   talk: "<ctrl>+<alt>+<space>"    # start listening without saying the wake word
-  open_window: "<ctrl>+<alt>+n"   # open MD's window from anywhere
+  open_window: "<ctrl>+<alt>+n"   # open Lyra's window from anywhere
 
 whatsapp:
   message_language: "roman_urdu"  # "roman_urdu" converts English dictation; "as_spoken" keeps it as said

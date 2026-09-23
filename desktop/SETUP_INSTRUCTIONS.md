@@ -40,34 +40,45 @@ python -m pytest         # unit tests (no Ollama or microphone needed)
 
 ### As a Windows app (normal way)
 
-Double-click **`md.pyw`** — no terminal, no browser, no server, and **no window**: MD starts invisibly
-and waits for its name ("Hello MD", "Hey MD" — whatever you named it). Answers come back by voice.
+Double-click **`lyra.pyw`** — no terminal, no browser, no server, and **no window**: Lyra starts invisibly
+and waits for its name ("Hello Lyra", "Hey Lyra" — whatever you named it). Answers come back by voice.
 Its window is only built when you ask for it ("open your window", Ctrl+Alt+N, or the tray menu).
-`md.pyw --show` (the Start-menu shortcut) opens the window straight away. `python main.py` = invisible start too.
+`lyra.pyw --show` (the Start-menu shortcut) opens the window straight away. `python main.py` = invisible start too.
 
-- MD lives in the **system tray** (near the clock). Its menu: *Open*, *Talk now*, *Settings*,
+- Lyra lives in the **system tray** (near the clock). Its menu: *Open*, *Talk now*, *Settings*,
   *Pause listening*, *Start with Windows*, *Show in Start menu*, *Quit*.
-- **Ctrl+Alt+N** opens MD's window from anywhere; launching `md.pyw` again while MD runs
-  just brings the window to the front (only one MD ever runs).
-- Closing the window keeps MD running in the tray; *Quit* in the tray menu stops it.
-- Tick **Start with Windows** (tray or Settings → Background) and MD starts quietly in the tray
-  every time you sign in. **Show in Start menu** lets you find it by searching “MD”.
+- **Ctrl+Alt+N** opens Lyra's window from anywhere; launching `lyra.pyw` again while Lyra runs
+  just brings the window to the front (only one Lyra ever runs).
+- Closing the window keeps Lyra running in the tray; *Quit* in the tray menu stops it.
+- Tick **Start with Windows** (tray or Settings → Background) and Lyra starts quietly in the tray
+  every time you sign in. **Show in Start menu** lets you find it by searching “Lyra”.
 - The window is a native WebView2 window (the Windows component WhatsApp Desktop uses), so screen
   readers such as Narrator and NVDA can read it. Nothing listens on the network: the window calls
-  MD's functions directly inside the same process.
+  Lyra's functions directly inside the same process.
 
 The window has these sections:
 
-- **Chat** — press 🎤 (or `Ctrl+Space`), wait for the beep, speak — MD uses the same microphone as
-  the wake word. Or type. `Esc` stops speech. Tick “Keep listening after each reply” for a hands-free conversation.
-- **My Commands** — make your own voice commands: a phrase plus steps (one per line), e.g.
+- **Home** — voice only, no chat box. The orb shows what Lyra is doing (waiting for her name,
+  listening, thinking, speaking) and live captions show what she heard and said. Just say “Hey Lyra”;
+  clicking the orb or `Ctrl+Alt+Space` also starts a conversation. `Esc` stops her speaking.
+- **Voice** — pick one of 12 speaking voices (8 female: Amy, Kristin, Lena, Harper, Jenny, Cori,
+  Alba, Zira; 4 male: Ryan, Alan, Joe, David), preview them, set speed and volume. Neural voices
+  (Piper, offline) download once (~63 MB each; Amy ships with the installer); Zira and David are
+  built into Windows. Also here: wake word, microphone, recognition language and voice print.
+  By voice: “change your voice to Jenny”, “what voices do you have”.
+- **Routines** — your own voice commands: a phrase plus steps (one per line), e.g.
   phrase `work mode` → `open vs code`, `open gmail`, `say: Let's get to work!`, `start focus for 50 minutes`.
-  🎤 buttons let you dictate phrases and steps. “Check steps” shows how each step will be understood.
-- **Settings** — switch whole features on/off (apps, screen reading, commands, files, code, memory…),
-  set your name and location (for prayer times), the AI model, speech model and language, reply voice and speed.
-- **Memory & Goals** — see and delete what the companion remembers, add goals, cancel reminders.
+  The mic buttons let you say phrases and steps. “Check steps” shows how each step will be understood.
+- **Accounts** — which browser profile is which account; how you say your WhatsApp contacts.
+- **Memory** — goals, reminders and what Lyra remembers; add to them by voice.
+- **Settings** — features on/off, your name and location (for prayer times), AI model, prayer,
+  notifications, calls, shortcuts, focus, expert mode, startup. Light/dark theme: the button at
+  the bottom of the sidebar.
 
-Changes made in Settings are saved to `data/settings.yaml` (they override `config.yaml`).
+Settings save automatically to `data/settings.yaml` (they override `config.yaml`).
+
+**Upgrading from the earlier release:** the installer removes it and Lyra moves your memories,
+settings and voice prints from `%LOCALAPPDATA%\MD` to `%LOCALAPPDATA%\Lyra` on first start.
 
 The old browser interface still exists for developers (`python main.py --mode web`), but nothing
 starts it any more.
@@ -83,17 +94,17 @@ python main.py --mode basic          # plain chat with /slash commands only
 python main_accessibility.py         # voice-first (push-to-talk); add --hands-free or --quiet
 ```
 
-## Talking to MD (a conversation, not one command)
+## Talking to Lyra (a conversation, not one command)
 
-Say the name once — "Hello MD" — and MD answers "Ji?". After every answer it beeps and listens
+Say the name once — "Hello Lyra" — and Lyra answers "Ji?". After every answer it beeps and listens
 again, so you can keep talking without repeating its name:
 
-1. You: "Hello MD" → MD: "Ji?"  2. "what time is it" → answer, beep  3. "open notepad" → done, beep
+1. You: "Hello Lyra" → Lyra: "Ji?"  2. "what time is it" → answer, beep  3. "open notepad" → done, beep
 4. "bas, shukriya" / "bye" / "Allah Hafiz" / "that's all" → "Theek hai, Allah Hafiz." and it goes back to waiting.
 
 - Silence for 6 seconds also ends the conversation quietly.
 - Noise or gibberish (coughs, "the the the", Whisper's invented "Thank you") is skipped; twice in a
-  row and MD says "Samajh nahi aaya" and stops.
+  row and Lyra says "Samajh nahi aaya" and stops.
 - Turn it off with `voice.conversation: false` (then each command needs the name again);
   `voice.follow_up_seconds` changes the 6-second wait.
 
@@ -101,18 +112,18 @@ again, so you can keep talking without repeating its name:
 
 | What | Say |
 |---|---|
-| Rename MD | "your name is MD", "call yourself Zoya" (asks first; the wake phrase changes to the new name) |
+| Rename Lyra | "your name is Lyra", "call yourself Zoya" (asks first; the wake phrase changes to the new name) |
 | Your name / city | "call me Muheb", "I live in Lahore", "main Karachi mein rehta hoon" (fills prayer-time location) |
 | Features | "turn off notifications", "enable translation", "whatsapp on karo" |
 | Window | "open your window", "open your settings", "show my memory" |
 | Quiet | "stop listening for 10 minutes", "go to sleep" (Ctrl+Alt+Space or the tray wakes it again) |
 
-Long answers and code are not read out character by character: MD says a short version and puts the
+Long answers and code are not read out character by character: Lyra says a short version and puts the
 full text in its window. Slow jobs (expert answers, translation, research) get an instant "Ek minute…".
 
 ### Long-term memory that updates itself
 
-MD keeps facts, preferences, goals, projects and people in `data/memory.db` (local SQLite on this
+Lyra keeps facts, preferences, goals, projects and people in `data/memory.db` (local SQLite on this
 computer only — not encrypted, nothing uploaded). When you say something that changes an old memory,
 it **replaces** it instead of keeping both:
 
@@ -126,8 +137,8 @@ it **replaces** it instead of keeping both:
 
 ### During a call
 
-MD stays silent during calls (nothing is spoken into the call). The wake word still works for call
-commands only — "Hello MD, record this call" / "stop recording" — shown as a small popup. Recording
+Lyra stays silent during calls (nothing is spoken into the call). The wake word still works for call
+commands only — "Hello Lyra, record this call" / "stop recording" — shown as a small popup. Recording
 still asks you every time and reminds you to tell the other person; your own voice saying the command
 is heard on the call.
 
@@ -189,38 +200,38 @@ and only then presses Enter. Add contacts on the Accounts & Contacts page (a pho
 the exact chat; otherwise WhatsApp is searched by the saved name, and if several chats match you
 are asked which one).
 
-## MD: background, calls, voice print, pointer, system control, expert mode
+## Lyra: background, calls, voice print, pointer, system control, expert mode
 
-**Name.** The assistant is called *MD*; change it under Settings → About you and the wake word
+**Name.** The assistant is called *Lyra*; change it under Settings → About you and the wake word
 follows (“Hey Zoya”). Custom wake names can still be listed under Settings → Voice.
 
-**Microphone switching.** MD records through Windows' own audio system and follows the Windows
+**Microphone switching.** Lyra records through Windows' own audio system and follows the Windows
 default microphone: connect AirPods and it moves to them, take them out and it returns to the
 laptop mic — mid-sentence, without restarting. If a mic sends pure silence for 3 s it tries another.
 
 **Voice print (max 2 people).** Settings → Voice print → record three sentences → Save. From then
-on only enrolled voices can wake MD (strangers get “main sirf pehchaani hui awaaz par kaam karti
-hoon”). “Hey MD” alone is too short to recognise a voice, so MD checks the name *plus* the
+on only enrolled voices can wake Lyra (strangers get “main sirf pehchaani hui awaaz par kaam karti
+hoon”). “Hey Lyra” alone is too short to recognise a voice, so Lyra checks the name *plus* the
 command together. It's a convenience filter, not strong security, and never unlocks anything.
 
 **Calls.** When WhatsApp, Teams, Zoom, Skype, Discord, Phone Link or a Meet/Zoom/Teams browser tab
-starts using the microphone, MD goes silent (no speech, no wake word) and a small pop-up asks
+starts using the microphone, Lyra goes silent (no speech, no wake word) and a small pop-up asks
 *Record & take notes / No* (it closes as “No” after 30 s). Recording is never automatic, and the
 pop-up reminds you that everyone on the call must agree — recording people without their consent
 is illegal in many places. Both sides are recorded (your mic + the computer's sound). When the call
-ends MD saves `data/calls/<date>/me.wav, them.wav, transcript.txt, notes.md`, tells you the summary
+ends Lyra saves `data/calls/<date>/me.wav, them.wav, transcript.txt, notes.md`, tells you the summary
 and action items (offers to add them as goals), asks how the call went and suggests water / a break.
 
-**Running in the background.** Double-click `md.pyw` (tray icon with Open /
-Pause listening / Start with Windows / Quit), or tick *Start MD … when I sign in* in Settings. While
-Windows is **locked** MD keeps listening and can answer questions, set reminders, read
+**Running in the background.** Double-click `lyra.pyw` (tray icon with Open /
+Pause listening / Start with Windows / Quit), or tick *Start Lyra … when I sign in* in Settings. While
+Windows is **locked** Lyra keeps listening and can answer questions, set reminders, read
 notifications and prayer times, but refuses anything that controls the computer (opening apps,
 typing, files, messages) until you unlock. After sleep it restarts listening by itself. It does not
 run on the sign-in screen before you log in — that would require a system service with access to
 your account and would weaken Windows' own lock.
 
 **Screen & mouse.** “Yeh kya hai?” / “what is this?” — says what's under the pointer. “Start mouse
-reading” — rest the pointer anywhere and MD names it. “Show me the Save button” — glides the mouse
+reading” — rest the pointer anywhere and Lyra names it. “Show me the Save button” — glides the mouse
 there and outlines it. “Click Send” — clicks it (asks first for risky buttons: delete, send, pay…).
 
 **System control.** “Install VLC” / “install Spotify from the Microsoft Store” (winget; asks which
@@ -228,20 +239,20 @@ package and confirms), “show budget.xlsx in Explorer”, “switch to the YouT
 (opens claude.ai if the desktop app isn't installed), “run command …” (confirmed).
 
 **Self-diagnosis.** “Diagnose yourself” / “kya masla hai” — checks Ollama, models, microphone,
-packages, disk and MD's own log; offers safe fixes (start Ollama, download a model, pip-install a
-package) and explains logged errors with the source line and the exact commands to run. MD does
+packages, disk and Lyra's own log; offers safe fixes (start Ollama, download a model, pip-install a
+package) and explains logged errors with the source line and the exact commands to run. Lyra does
 not rewrite its own code by itself.
 
 **Expert mode.** Web-development, UI/UX, database and architecture questions (“blueprint for an
 online bakery”, “design a database for a school”, “research best auth for Next.js”) go to expert
 mode. Default is the local model (free, private, ~1–2 min per answer on this CPU). For top-quality
 answers choose *Claude* under Settings → Expert, set `ANTHROPIC_API_KEY` in Windows yourself, and
-set a weekly US$ limit — MD counts every request's tokens and falls back to the local model when
+set a weekly US$ limit — Lyra counts every request's tokens and falls back to the local model when
 the week's budget is used. “Create a Next.js app called shop” scaffolds a project in
 `~/Projects` (confirmed) and opens it in VS Code.
 
 **Not included:** a phone app. The browser page works at phone size, but reaching it from a phone
-means exposing MD (which can control this computer) on your network and serving HTTPS for the
+means exposing Lyra (which can control this computer) on your network and serving HTTPS for the
 microphone — a separate, security-sensitive piece of work.
 
 ## Where things are stored

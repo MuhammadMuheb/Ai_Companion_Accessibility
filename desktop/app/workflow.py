@@ -72,7 +72,7 @@ BROWSER_NAMES = {"chrome": "chrome", "google chrome": "chrome", "edge": "edge", 
 
 # What may run while Windows is locked: talking and information, nothing that acts on the desktop,
 # files, accounts or messages — the lock screen must keep protecting the computer.
-LOCKED_OK = {"help", "say", "wait", "set_user_name", "set_city", "pause_listening", "repeat", "recent_activity", "time", "date", "remind", "prayer", "list_goals",
+LOCKED_OK = {"help", "say", "wait", "set_user_name", "set_city", "set_voice", "list_voices", "pause_listening", "repeat", "recent_activity", "time", "date", "remind", "prayer", "list_goals",
              "add_goal", "advice", "morning", "system_status", "focus_start", "focus_stop", "call_notes",
              "record_call", "expert", "research", "remember", "list_memories", "diagnose", "update_goal",
              "done_goal", "memory_changes"}
@@ -395,6 +395,33 @@ class Workflow:
         self._apply_settings({"assistant": {"name": name}, "voice": {"wake_phrases": ""}})
         return f"From now on my name is {name}. Say “Hey {name}” when you need me."
 
+    def do_set_voice(self, name: str) -> str:
+        from app.voice import voices
+
+        key = name.strip().lower()
+        wanted = {"female": "amy", "girl": "amy", "woman": "amy", "lady": "amy", "larki": "amy",
+                  "male": "ryan", "boy": "ryan", "man": "ryan", "larka": "ryan",
+                  "british": "jenny", "scottish": "alba", "american": "amy", "windows": "zira"}.get(key, key)
+        voice = voices.BY_ID.get(wanted) or next((v for v in voices.VOICES if v.name.lower() == wanted), None)
+        if voice is None:
+            names = ", ".join(v.name for v in voices.VOICES)
+            return f"I don't have a voice called {name.title()}. I can speak as {names}."
+        self._apply_settings({"voice": {"tts_voice": voice.id}})
+        if voices.is_ready(voice):
+            return f"Okay, this is my {voice.name} voice. How do I sound?"
+        voices.downloads.start(voice.id)
+        return (f"Downloading {voice.name}'s voice now — about {voice.size_mb} megabytes. I'll switch to it by "
+                "myself as soon as it's ready.")
+
+    def do_list_voices(self) -> str:
+        from app.voice import voices
+
+        female = ", ".join(v.name for v in voices.VOICES if v.gender == "female")
+        male = ", ".join(v.name for v in voices.VOICES if v.gender == "male")
+        current = voices.get_voice(get_config().voice.tts_voice).name
+        return (f"I have {len(voices.VOICES)} voices. Female: {female}. Male: {male}. Right now I'm {current}. "
+                "Say “change your voice to” and a name.")
+
     def do_set_user_name(self, name: str) -> str:
         name = name.strip().strip(".").title()
         self._apply_settings({"user": {"name": name}})
@@ -440,14 +467,15 @@ class Workflow:
         label = next(f["label"] for f in items if f["key"] == key).split("(")[0].split(",")[0].strip()
         return f"{label}: {'on' if on else 'off'}."
 
-    def do_show_window(self, tab: str = "chat") -> str:
+    def do_show_window(self, tab: str = "home") -> str:
         opener = (self.services.extra_hotkeys.get("open_window") if self.services else None)
         if opener is None:
             return "My window isn't available in this mode."
-        tab = {"window": "chat", "chat": "chat", "settings": "settings", "memory": "memory", "commands": "commands",
-               "accounts": "accounts"}.get(tab, "chat")
-        opener(tab) if tab != "chat" else opener()
-        return "Here you go." if tab == "chat" else f"Opening {tab}."
+        tab = {"window": "home", "chat": "home", "home": "home", "settings": "settings", "memory": "memory",
+               "commands": "routines", "routines": "routines", "accounts": "accounts", "voice": "voice",
+               "voices": "voice"}.get(tab, "home")
+        opener(tab) if tab != "home" else opener()
+        return "Here you go." if tab == "home" else f"Opening {tab}."
 
     def do_pause_listening(self, minutes: int = 0) -> str:
         wake = self.services.wake if self.services else None

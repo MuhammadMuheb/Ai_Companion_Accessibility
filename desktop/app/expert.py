@@ -5,10 +5,10 @@ Backends:
 - "local" (default): the best installed Ollama model — free and private, but a small CPU
   model is nowhere near "top-tier"; answers are shorter and less reliable.
 - "claude": Claude via the Anthropic API, if you have set up credentials yourself
-  (ANTHROPIC_API_KEY or `ant auth login`). MD never asks for or stores the key.
+  (ANTHROPIC_API_KEY or `ant auth login`). Lyra never asks for or stores the key.
 
 A weekly spending cap (Settings → Expert) is enforced from the token counts the API reports;
-once it is reached MD falls back to the local model until the next week starts.
+once it is reached Lyra falls back to the local model until the next week starts.
 """
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ from app.logger import get_logger
 
 log = get_logger(__name__)
 
-EXPERT_SYSTEM = """You are MD's expert mode: a principal software engineer, web architect and product designer.
+EXPERT_SYSTEM = """You are Lyra's expert mode: a principal software engineer, web architect and product designer.
 Expertise: Next.js (App Router, Server Components, Server Actions), React, TypeScript, Tailwind, UI/UX and
 accessibility (WCAG), Node, Python/FastAPI, REST/GraphQL, PostgreSQL/MySQL/SQLite/MongoDB/Redis schema
 design, auth, caching, testing, CI/CD, Docker, Vercel/cloud deployment, performance and security.

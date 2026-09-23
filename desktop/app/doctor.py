@@ -1,9 +1,9 @@
 """Self-diagnosis and repair.
 
 `check()` runs health checks (Ollama, models, microphone, speech, OCR, Python packages, disk,
-notification database) and `recent_errors()` pulls real tracebacks out of MD's own log and
+notification database) and `recent_errors()` pulls real tracebacks out of Lyra's own log and
 points at the source line. Problems with a known, safe fix (start Ollama, pull a missing model,
-pip-install a missing package) are fixed after the user says yes. For anything else MD explains
+pip-install a missing package) are fixed after the user says yes. For anything else Lyra explains
 the likely cause and gives the exact commands — it does not rewrite its own code by itself.
 """
 
@@ -25,7 +25,8 @@ log = get_logger(__name__)
 
 PACKAGES = {  # import name -> pip name, feature
     "faster_whisper": ("faster-whisper", "speech recognition"),
-    "pyttsx3": ("pyttsx3", "speaking"),
+    "pyttsx3": ("pyttsx3", "speaking (Windows voices)"),
+    "piper": ("piper-tts", "neural voices"),
     "soundcard": ("soundcard", "microphone switching and call recording"),
     "onnxruntime": ("onnxruntime", "voice print"),
     "kaldi_native_fbank": ("kaldi-native-fbank", "voice print"),
@@ -34,8 +35,8 @@ PACKAGES = {  # import name -> pip name, feature
     "pyautogui": ("pyautogui", "mouse and keyboard control"),
     "pystray": ("pystray", "tray icon"),
     "anthropic": ("anthropic", "Claude expert mode"),
-    "fastapi": ("fastapi", "MD's window (in-process API)"),
-    "webview": ("pywebview", "MD's native window"),
+    "fastapi": ("fastapi", "Lyra's window (in-process API)"),
+    "webview": ("pywebview", "Lyra's native window"),
 }
 
 
@@ -120,7 +121,7 @@ def fix(issue: Issue) -> str:
         return f"{issue.fix_label} failed: {e}"
 
 
-# ---- errors from MD's own log -------------------------------------------------------------
+# ---- errors from Lyra's own log -------------------------------------------------------------
 
 _TB_START = re.compile(r"^Traceback \(most recent call last\):")
 _FRAME = re.compile(r'File "([^"]+)", line (\d+), in (\S+)')

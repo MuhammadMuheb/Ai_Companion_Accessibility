@@ -27,7 +27,15 @@ class VoiceEngine:
         self.echo = echo  # also print what is heard and said
         self.on_event = on_event  # ("heard" | "said", text) — lets the web page show voice conversations
         self._busy = threading.Lock()
+        # live state for the window's voice orb: idle | listening | thinking | speaking
+        self.phase = "idle"
+        self.level = 0.0
         notifications.add_listener(self._speak_notification)
+
+    def set_phase(self, phase: str) -> None:
+        self.phase = phase
+        if phase != "listening":
+            self.level = 0.0
 
     def _emit(self, kind: str, text: str) -> None:
         if self.on_event and text:
@@ -40,21 +48,30 @@ class VoiceEngine:
         # don't talk over the user mid-conversation; the console/toast still shows it
         if self._busy.acquire(blocking=False):
             try:
+                self.set_phase("speaking")
                 self.speaker.say(f"{title}. {message}")
             finally:
+                self.set_phase("idle")
                 self._busy.release()
 
     def warm_up(self) -> None:
         """Load the speech model and measure room noise up front so the first command is fast."""
+        from app.voice.mic import check_shared_mode
+
         _ = self.listener.model
         self.listener.calibrate()
+        check_shared_mode()
 
     def say(self, text: str) -> None:
         if self.echo:
             print(f"AI: {text}\n")
         self._emit("said", text)
         with self._busy:
-            self.speaker.say(text)
+            self.set_phase("speaking")
+            try:
+                self.speaker.say(text)
+            finally:
+                self.set_phase("thinking")
 
     def say_stream(self, pieces: Iterable[str]) -> str:
         """Speak a streamed reply one sentence at a time, starting before it's complete."""
@@ -62,7 +79,10 @@ class VoiceEngine:
         if self.echo:
             print("AI: ", end="", flush=True)
         with self._busy:
+            self.set_phase("thinking")
             for piece in pieces:
+                if full and self.phase != "speaking":
+                    self.set_phase("speaking")
                 full.append(piece)
                 if self.echo:
                     print(piece, end="", flush=True)
@@ -74,10 +94,16 @@ class VoiceEngine:
             if buffer.strip():
                 self.speaker.say(buffer, wait=False)
             self.speaker.wait_until_done()
+            self.set_phase("thinking")
         if self.echo:
             print("\n")
         self._emit("said", "".join(full))
         return "".join(full)
+
+    def _level(self, level: float, threshold: float, started: bool) -> None:
+        self.level = min(1.0, level / max(threshold * 4, 0.02))
+        if self.echo:
+            self._meter(level, threshold, started)
 
     @staticmethod
     def _meter(level: float, threshold: float, started: bool) -> None:
@@ -92,7 +118,11 @@ class VoiceEngine:
     def listen_with_audio(self, **kwargs):
         """(text, audio) — the audio is used for voice-print checks."""
         with self._busy:
-            audio = self.listener.record(beeps=True, on_level=self._meter if self.echo else None, **kwargs)
+            self.set_phase("listening")
+            try:
+                audio = self.listener.record(beeps=True, on_level=self._level, **kwargs)
+            finally:
+                self.set_phase("thinking")
             if self.echo:
                 print("\r" + " " * 32 + "\r", end="", flush=True)
                 if audio.size and self.listener.last_peak <= self.listener.threshold:

@@ -1,6 +1,6 @@
-"""MD — entry point.
+"""Lyra — entry point.
 
-    python main.py                    # MD, invisible in the background (same as md.pyw)
+    python main.py                    # Lyra, invisible in the background (same as lyra.pyw)
     python main.py --mode text        # text chat in this terminal
     python main.py --mode basic       # plain chat with slash commands only
     python main.py --mode hybrid      # press Enter to speak or type; replies are spoken
@@ -71,7 +71,7 @@ def main() -> int:
     _utf8_console()
     parser = argparse.ArgumentParser(description="Local AI companion")
     parser.add_argument("--mode", choices=["app", "text", "basic", "hybrid", "voice", "wake", "web"], default="app")
-    parser.add_argument("--show", action="store_true", help="app mode: also open MD's window")
+    parser.add_argument("--show", action="store_true", help="app mode: also open Lyra's window")
     parser.add_argument("--port", type=int, default=8765, help="web mode: port to listen on")
     parser.add_argument("--no-browser", action="store_true", help="web mode: don't open the browser")
     parser.add_argument("--check", action="store_true", help="check Ollama, models and features, then exit")

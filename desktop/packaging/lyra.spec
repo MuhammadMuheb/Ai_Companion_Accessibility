@@ -1,5 +1,6 @@
-# PyInstaller spec for MD.exe — build with packaging\build.ps1 (run from the desktop folder).
-# One folder, windowed (no console). Speech models are bundled so MD works offline after install.
+# PyInstaller spec for Lyra.exe — build with packaging\build.ps1 (run from the desktop folder).
+# One folder, windowed (no console). Speech models and the default neural voice are bundled so Lyra
+# works offline after install.
 
 from PyInstaller.utils.hooks import collect_all, collect_submodules, copy_metadata
 
@@ -9,7 +10,7 @@ datas = [
     (ROOT + "\\app\\web\\static", "app\\web\\static"),
     (ROOT + "\\config.yaml", "."),
     (SPECPATH + "\\models", "models"),
-    (SPECPATH + "\\md.ico", "."),
+    (SPECPATH + "\\lyra.ico", "."),
 ]
 binaries = []
 hiddenimports = collect_submodules("app") + [
@@ -21,7 +22,7 @@ hiddenimports = collect_submodules("app") + [
 ]
 
 # packages with native DLLs, data files or plugin discovery
-for pkg in ("faster_whisper", "ctranslate2", "av", "tokenizers", "webview", "clr_loader",
+for pkg in ("piper", "faster_whisper", "ctranslate2", "av", "tokenizers", "webview", "clr_loader",
             "pythonnet", "uiautomation", "soundcard", "sounddevice", "soundfile", "kaldi_native_fbank",
             "adhanpy", "tzdata", "winrt", "pyttsx3", "comtypes", "plyer", "pystray", "pynput", "pyautogui",
             "pygetwindow", "pyperclip", "psutil", "anthropic", "httpx", "starlette", "fastapi", "pydantic"):
@@ -34,14 +35,14 @@ for pkg in ("faster_whisper", "ctranslate2", "av", "tokenizers", "webview", "clr
     hiddenimports += h
 
 for dist in ("apscheduler", "faster-whisper", "fastapi", "pydantic", "anthropic", "httpx", "tokenizers",
-             "huggingface-hub", "pywebview", "tqdm", "requests"):
+             "huggingface-hub", "pywebview", "piper-tts", "tqdm", "requests"):
     try:
         datas += copy_metadata(dist)
     except Exception:
         pass
 
 a = Analysis(
-    [ROOT + "\\md.pyw"],
+    [ROOT + "\\lyra.pyw"],
     pathex=[ROOT],
     binaries=binaries,
     datas=datas,
@@ -55,10 +56,10 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name="MD",
-    icon=SPECPATH + "\\md.ico",
+    name="Lyra",
+    icon=SPECPATH + "\\lyra.ico",
     console=False,
     version=SPECPATH + "\\version.txt",
     upx=False,
 )
-coll = COLLECT(exe, a.binaries, a.datas, strip=False, upx=False, name="MD")
+coll = COLLECT(exe, a.binaries, a.datas, strip=False, upx=False, name="Lyra")

@@ -7,7 +7,7 @@ Skype, Discord, Phone Link — or a browser showing a Meet/Zoom/Teams/WhatsApp p
 the mic, a call has started; when it stops, the call has ended. Incoming-call notifications
 ("... is calling") are announced as they arrive.
 
-During a call MD stays silent (no speech, no wake word) so nothing of it is heard in the call.
+During a call Lyra stays silent (no speech, no wake word) so nothing of it is heard in the call.
 Recording is never automatic: a small pop-up asks every time, and reminds the user that the
 other people on the call must agree to being recorded.
 """
@@ -40,7 +40,7 @@ CALL_APPS = {
 }
 BROWSERS = {"chrome.exe", "msedge.exe", "brave.exe", "firefox.exe", "opera.exe"}
 BROWSER_CALL_TITLES = re.compile(r"\bmeet\b|zoom|teams|whatsapp|discord|call|webex|skype", re.I)
-IGNORE = {"python.exe", "pythonw.exe"}  # MD itself
+IGNORE = {"python.exe", "pythonw.exe"}  # Lyra itself
 INCOMING = re.compile(r"incoming (?:voice |video )?call|is calling|calling you|voice call|video call", re.I)
 SAMPLE_RATE = 16_000
 

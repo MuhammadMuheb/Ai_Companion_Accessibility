@@ -1,18 +1,25 @@
-"""Start MD — double-click this file (no console window opens).
+"""Start Lyra — double-click this file (no console window opens).
 
-MD starts invisibly in the background — just say "Hey MD" (or your wake name).
+Lyra starts invisibly in the background — just say "Hey Lyra" (or your wake name).
 Launching it again while it runs opens its window.
-    md.pyw           start invisibly (also what "Start with Windows" does)
-    md.pyw --show    start and open the window
-    md.pyw --selftest   check every component, write data/logs/selftest.json, exit
+    lyra.pyw           start invisibly (also what "Start with Windows" does)
+    lyra.pyw --show    start and open the window
+    lyra.pyw --selftest   check every component, write data/logs/selftest.json, exit
 """
 
 import os
 import sys
 
 if getattr(sys, "frozen", False):
-    # installed MD.exe: work in the writable data folder, not in Program Files
-    data_home = os.path.join(os.environ.get("LOCALAPPDATA") or os.path.expanduser("~"), "MD")
+    # installed Lyra.exe: work in the writable data folder, not in Program Files
+    local = os.environ.get("LOCALAPPDATA") or os.path.expanduser("~")
+    data_home = os.path.join(local, "Lyra")
+    legacy_home = os.path.join(local, "MD")  # data folder of the earlier release: keep memories and settings
+    if not os.path.exists(data_home) and os.path.isdir(os.path.join(legacy_home, "data")):
+        try:
+            os.replace(legacy_home, data_home)
+        except OSError:
+            pass
     os.makedirs(data_home, exist_ok=True)
     os.chdir(data_home)
 else:

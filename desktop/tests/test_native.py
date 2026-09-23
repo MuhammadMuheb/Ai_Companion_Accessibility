@@ -59,7 +59,7 @@ def test_page_is_self_contained():
     from app.daemon import page_html
 
     html = page_html()
-    assert "window.MD_NATIVE = true" in html
+    assert "window.LYRA_NATIVE = true" in html
     assert "__TOKEN__" not in html and server.TOKEN in html
     assert '<link rel="stylesheet" href="/static/' not in html and '<script src="/static/' not in html
     assert "async function api(" in html and ":root {" in html
@@ -69,13 +69,13 @@ def test_single_instance_across_processes():
     from app.single_instance import SingleInstance
 
     got = threading.Event()
-    with SingleInstance("MDPytest") as first:
+    with SingleInstance("LyraPytest") as first:
         assert first.primary
         first.on_show_request(got.set)
         code = ("from app.single_instance import SingleInstance\n"
-                "with SingleInstance('MDPytest') as s: print(s.primary, s.signal_running())")
+                "with SingleInstance('LyraPytest') as s: print(s.primary, s.signal_running())")
         out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, timeout=60).stdout.split()
         assert out == ["False", "True"]
         assert got.wait(3)
-    with SingleInstance("MDPytest") as again:
+    with SingleInstance("LyraPytest") as again:
         assert again.primary

@@ -1,5 +1,5 @@
-# MD installer for Windows - right-click > "Run with PowerShell" (no administrator rights needed).
-# Installs the Python packages and the local AI models, then adds MD to the Start menu and to
+# Lyra installer for Windows - right-click > "Run with PowerShell" (no administrator rights needed).
+# Installs the Python packages and the local AI models, then adds Lyra to the Start menu and to
 # Windows sign-in. Safe to run again: it only adds what is missing.
 
 $ErrorActionPreference = "Stop"
@@ -38,13 +38,13 @@ foreach ($model in @("qwen2.5:1.5b", "nomic-embed-text", "gemma3:4b")) {
     else { Write-Host "Downloading $model ..."; & ollama pull $model }
 }
 
-Step "Adding MD to the Start menu and to Windows sign-in"
+Step "Adding Lyra to the Start menu and to Windows sign-in"
 & $exe @pyArgs -c "from app.tray import set_start_menu, set_autostart; print(set_start_menu(True)); print(set_autostart(True))"
 
 Step "Health check"
 & $exe @pyArgs main.py --check
 
-Write-Host "`nDone! Starting MD in the background - say 'Hello MD'." -ForegroundColor Green
+Write-Host "`nDone! Starting Lyra in the background - say 'Hello Lyra'." -ForegroundColor Green
 $pythonw = (& $exe @pyArgs -c "import sys, pathlib; print(pathlib.Path(sys.executable).with_name('pythonw.exe'))").Trim()
-Start-Process -FilePath $pythonw -ArgumentList "`"$PSScriptRoot\md.pyw`"" -WorkingDirectory $PSScriptRoot
+Start-Process -FilePath $pythonw -ArgumentList "`"$PSScriptRoot\lyra.pyw`"" -WorkingDirectory $PSScriptRoot
 Read-Host "Press Enter to close"

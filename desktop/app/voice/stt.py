@@ -169,6 +169,25 @@ class Listener:
         # capped so a noisy calibration second (fan, typing) can't make the mic "deaf"
         return min(MAX_THRESHOLD, max(MIN_THRESHOLD, self.noise_floor * 3))
 
+    def _close_mic(self) -> None:
+        """Emergency: forcefully close any open microphone stream to prevent locks."""
+        import gc
+        try:
+            import soundcard
+            sc = soundcard
+            for attr in dir(self):
+                if isinstance(getattr(self, attr, None), object):
+                    try:
+                        obj = getattr(self, attr)
+                        if hasattr(obj, '_rec') and obj._rec is not None:
+                            obj._close()
+                    except Exception:
+                        pass
+            gc.collect()
+            log.info("Microphone stream forcefully closed")
+        except Exception as e:
+            log.warning("Failed to close microphone: %s", e)
+
     def calibrate(self, seconds: float = 1.0) -> None:
         """Measure background noise so speech detection adapts to the room. Uses the median
         block level so a single click or cough doesn't raise the threshold."""

@@ -3,7 +3,7 @@
 - `describe_pointer()`: what the mouse is on (button/link/text name via UI Automation, OCR
   fallback) — "yeh kya hai?" while pointing.
 - `MouseReader`: optional "mouse reading" mode — rest the pointer on something for a moment
-  and MD says what it is (like a screen reader's mouse echo).
+  and Lyra says what it is (like a screen reader's mouse echo).
 - `show(query)` / `click(query)`: find a control by name in the front window, glide the mouse
   to it and highlight it; clicking asks first for risky buttons (delete, send, pay...).
 """

@@ -11,6 +11,7 @@ import re
 from dataclasses import dataclass, field
 
 from app.config import get_config, save_settings
+from app.voice.voices import VOICES
 
 # Settings the user may edit: section -> {key: type}
 EDITABLE = {
@@ -23,7 +24,8 @@ EDITABLE = {
     "voice": {"stt_model_size": str, "wake_model_size": str, "language": str, "hint": str, "input_device": str,
               "wake_enabled": bool, "wake_phrases": list, "wake_sensitivity": float,
               "voiceprint_enabled": bool, "voiceprint_threshold": float,
-              "conversation": bool, "follow_up_seconds": float},
+              "conversation": bool, "follow_up_seconds": float,
+              "tts_voice": str, "tts_rate": float, "tts_volume": float},
     "scheduler": {"checkin_time": str, "wakeup_time": str, "wakeup_enabled": bool,
                   "prayer_reminders_enabled": bool, "prayer_method": str, "madhab": str,
                   "prayer_reminder_minutes_before": int},
@@ -32,6 +34,7 @@ EDITABLE = {
     "hotkeys": {"enabled": bool, "translate": str, "talk": str, "open_window": str},
     "whatsapp": {"message_language": str, "verify_contact": bool},
 }
+TTS_KEYS = {"tts_voice", "tts_rate", "tts_volume"}
 VOICE_KEYS = {"stt_model_size", "wake_model_size", "language", "hint", "input_device", "wake_phrases"}
 
 # Allowed ranges / choices, checked before anything is saved
@@ -39,13 +42,15 @@ RANGES = {
     "user.latitude": (-90, 90), "user.longitude": (-180, 180), "llm.temperature": (0, 1.5),
     "llm.max_tokens": (50, 8000), "voice.wake_sensitivity": (0.5, 0.99), "voice.voiceprint_threshold": (0.2, 0.95),
     "scheduler.prayer_reminder_minutes_before": (0, 120), "focus.default_minutes": (1, 600),
-    "expert.weekly_budget_usd": (0, 10_000),
+    "expert.weekly_budget_usd": (0, 10_000), "voice.tts_rate": (0.5, 2.0), "voice.tts_volume": (0.1, 1.0),
+    "voice.follow_up_seconds": (2, 30),
 }
 CHOICES = {
     "expert.provider": {"local", "claude"}, "expert.effort": {"low", "medium", "high", "xhigh", "max"},
     "voice.stt_model_size": {"tiny", "base", "small", "medium"},
     "voice.wake_model_size": {"tiny", "base", "small", "medium"}, "voice.language": {"", "en", "ur", "hi"},
     "scheduler.madhab": {"HANAFI", "SHAFI"}, "whatsapp.message_language": {"roman_urdu", "as_spoken"},
+    "voice.tts_voice": {v.id for v in VOICES},
     "scheduler.prayer_method": {"KARACHI", "MUSLIM_WORLD_LEAGUE", "UMM_AL_QURA", "EGYPTIAN", "NORTH_AMERICA", "DUBAI",
                                 "KUWAIT", "QATAR", "SINGAPORE", "MOON_SIGHTING_COMMITTEE", "UOIF"},
 }
@@ -114,7 +119,9 @@ class SaveResult:
 
 def _snapshot(cfg):
     speech = {k: getattr(cfg.voice, k) for k in VOICE_KEYS} | {"name": cfg.user.name, "assistant": cfg.assistant.name}
-    background = (vars(cfg.voice).copy(), vars(cfg.notifications).copy(), vars(cfg.hotkeys).copy(), dict(cfg.features),
+    # the speaking voice is picked up by the speaker on its next sentence: no restart needed
+    voice = {k: v for k, v in vars(cfg.voice).items() if k not in TTS_KEYS}
+    background = (voice, vars(cfg.notifications).copy(), vars(cfg.hotkeys).copy(), dict(cfg.features),
                   vars(cfg.calls).copy())
     scheduler = (cfg.user.latitude, cfg.user.longitude, vars(cfg.scheduler).copy())
     return speech, background, scheduler

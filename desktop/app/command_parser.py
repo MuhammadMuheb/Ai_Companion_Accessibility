@@ -143,6 +143,12 @@ RULES: list[tuple[re.Pattern, str, callable]] = [(re.compile(p, re.I), name, fn)
      lambda m: {"minutes": int(m[3]) if m[3] else None, "task": m[4] or ""}),
 
     # ---- settings by voice (no need to open Settings) ----
+    (r"^(?:change|switch|set) (?:your |the )?voice to (?:a |the )?([a-z]+)(?: voice)?$|"
+     r"^(?:use|speak (?:with|in)) (?:a |the )?([a-z]+)(?:'?s)? voice$|"
+     r"^([a-z]+) (?:ki|wali|jaisi) (?:awaaz|aawaz|awaz)(?: (?:lagao|karo|use karo|mein bolo))?$", "set_voice",
+     lambda m: {"name": m[1] or m[2] or m[3]}),
+    (r"^(?:what|which) voices? (?:do you have|can you use|are there)|^(?:list|show)(?: me)? (?:your |the )?voices$|"
+     r"^(?:kaun kaun si|konsi) (?:awaazein|awaaz) hain", "list_voices", lambda m: {}),
     (r"^(?:your (?:new )?name (?:is|will be)|i'?ll call you|change your name to|call yourself|rename yourself(?: to)?|"
      r"tumhara naam(?: ab)?) ([a-z][\w .-]{0,20}?)(?: hai| ho| from now on)?$", "set_assistant_name", lambda m: {"name": m[1]}),
     (r"^(?:call me|my name is|mera naam) ([a-z][\w .-]{0,25}?)(?: hai)?$", "set_user_name", lambda m: {"name": m[1]}),
@@ -151,8 +157,9 @@ RULES: list[tuple[re.Pattern, str, callable]] = [(re.compile(p, re.I), name, fn)
     (r"^(?:turn|switch) (on|off) (?:the )?(.+?)(?: feature)?$|^(enable|disable) (?:the )?(.+?)(?: feature)?$|"
      r"^(.+?) (on|off|chalu)(?: karo| kar do)?$", "toggle_feature",
      lambda m: {"on": (m[1] or m[3] or m[6] or "").lower() in ("on", "enable", "chalu"), "name": m[2] or m[4] or m[5]}),
-    (r"^(?:open|show)(?: me)? (?:your |md'?s |the |my )?(window|settings|chat|memory|commands|accounts)(?: window| page)?$|"
-     r"^(?:settings|window) (?:kholo|dikhao)$", "show_window", lambda m: {"tab": (m[1] or "chat").lower()}),
+    (r"^(?:open|show)(?: me)? (?:your |lyra'?s |the |my )?(window|settings|chat|home|memory|commands|routines|accounts|"
+     r"voices?)(?: window| page| settings)?$|"
+     r"^(?:settings|window) (?:kholo|dikhao)$", "show_window", lambda m: {"tab": (m[1] or "home").lower()}),
     (r"^(?:stop|pause) listening(?: for (\d+) ?(?:minutes?|mins?))?$|^(?:go to sleep|so jao|chup ho jao)$", "pause_listening",
      lambda m: {"minutes": int(m[1]) if m[1] else 0}),
     # ---- updating memory and goals by voice (before add_goal / remember) ----

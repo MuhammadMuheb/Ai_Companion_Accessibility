@@ -19,7 +19,7 @@ log = get_logger(__name__)
 GREETINGS = ("Ji?", "Haan ji, boliye.", "Yes?")
 FAREWELLS = ("Theek hai, Allah Hafiz.", "Okay, bye! Bulana ho to mera naam lein.")
 MAX_TURNS = 20       # a conversation ends by itself after this many sentences
-MAX_GIBBERISH = 2    # noise in a row before MD stops listening
+MAX_GIBBERISH = 2    # noise in a row before Lyra stops listening
 SPEAK_LIMIT = 600  # characters; longer answers are summarised aloud and shown in full in the window
 
 
@@ -177,7 +177,7 @@ class Services:
                 if result is not None:
                     spoken, full = speakable(result or "Done.")
                     if full:
-                        self._event("said", result)  # the whole answer (code etc.) goes to MD's window
+                        self._event("said", result)  # the whole answer (code etc.) goes to Lyra's window
                     self.voice.say(spoken)
                 else:
                     reply = self.voice.say_stream(self.companion.reply_stream(text))
@@ -202,9 +202,19 @@ class Services:
         with self.lock:
             result = self.workflow.execute(intent) or ""
         self._event("note", f"📞 {result}")
-        get_overlay().prompt("MD", result, ["OK"], lambda _c: None, timeout=4)
+        get_overlay().prompt(get_config().assistant.name, result, ["OK"], lambda _c: None, timeout=4)
+
+    def _set_idle(self) -> None:
+        if self.voice is not None and hasattr(self.voice, "set_phase"):
+            self.voice.set_phase("idle")
 
     def handle_wake(self, rest: str, audio=None) -> None:
+        try:
+            self._handle_wake(rest, audio)
+        finally:
+            self._set_idle()
+
+    def _handle_wake(self, rest: str, audio=None) -> None:
         import numpy as np
 
         from app.runtime import in_call
@@ -219,7 +229,7 @@ class Services:
         command = rest.strip()
         if len(command.split()) < 1 or find_wake(command, get_config().wake_phrases) and len(command.split()) < 3:
             command = ""
-        # "Hey MD" alone is too short to recognise a voice; decide after hearing the command too
+        # "Hey Lyra" alone is too short to recognise a voice; decide after hearing the command too
         if command and (not check or vp.speech_seconds(audio) >= 1.2):
             if check and not self._authorised(audio):
                 return
@@ -292,9 +302,23 @@ class Services:
         if self.wake is not None:
             self.wake.trigger()  # handled on the wake thread so the mic isn't used twice
         elif self.voice is not None:
-            command = self.voice.listen(wait_seconds=7)
-            if command:
-                self.run_command(command)
+            try:
+                command = self.voice.listen(wait_seconds=7)
+                if command:
+                    self.run_command(command)
+            finally:
+                self._set_idle()
+
+    def run_in_background(self, text: str) -> None:
+        """Run a command as if it had been spoken (the window's "Try it" on a routine)."""
+        def job():
+            try:
+                self.run_command(text)
+            except Exception:
+                log.exception("Command %r failed", text)
+            finally:
+                self._set_idle()
+        threading.Thread(target=job, daemon=True, name="run-command").start()
 
     def translate_hotkey(self) -> None:
         from app.accessibility import translate
@@ -416,9 +440,9 @@ class Services:
     def _care_reply(self, feeling: str, minutes: int, has_items: bool) -> str:
         from app.llm import LLMError, get_llm
 
-        system = ("You are MD, a caring companion. The user just finished a phone call. Reply in 1-2 short, warm "
-                  "sentences in Roman Urdu. If they sound stressed or tired, suggest a glass of water, a few deep "
-                  "breaths or a short break. If the call was long, suggest stretching. Never lecture.")
+        system = (f"You are {get_config().assistant.name}, a caring companion. The user just finished a phone "
+                  "call. Reply in 1-2 short, warm sentences in Roman Urdu. If they sound stressed or tired, "
+                  "suggest a glass of water, a few deep breaths or a short break. If the call was long, suggest stretching. Never lecture.")
         try:
             return get_llm().ask(f"Call length: {minutes} minutes. The user says: {feeling or '(no answer)'}",
                                  system=system, temperature=0.6, max_tokens=80).strip()
@@ -426,7 +450,7 @@ class Services:
             return "Achha. Thoda paani pee lein aur ek minute aaraam kar lein."
 
     # ---- voice print enrolment ---------------------------------------------------------------
-    ENROL_SENTENCES = ["MD, aaj ka mausam kaisa hai?", "Please open YouTube and play some nasheeds.",
+    ENROL_SENTENCES = ["Lyra, aaj ka mausam kaisa hai?", "Please open YouTube and play some nasheeds.",
                        "Mujhe kal subah nau baje yaad dilana."]
 
     def enroll_voice(self, ask) -> str:

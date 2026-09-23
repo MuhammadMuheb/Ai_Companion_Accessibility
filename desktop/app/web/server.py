@@ -1,5 +1,6 @@
-"""Local web interface: chat by voice or text, switch features on/off, write your own
-commands, set up accounts and contacts, and manage memories, goals and reminders.
+"""Lyra's API — used in-process by the native window (see app.daemon.Bridge) and, optionally,
+over HTTP by the legacy browser mode. The window is a voice-first mirror: it shows what Lyra hears
+and says, lets you pick her voice, and holds the settings, routines, accounts and memory.
 
 The wake word, global hotkeys and notification monitor run here in the background, using
 this computer's microphone and speakers; what they hear and say also appears in the page.
@@ -70,8 +71,13 @@ class State:
                             "time": datetime.now().strftime("%I:%M %p").lstrip("0")})
 
     def push_notification(self, title: str, message: str) -> None:
-        # the server's own voice reads notifications when it is running; otherwise the page does
-        self.push("notification", message, title, speak=self.voice is None)
+        # the voice engine reads notifications aloud while it runs; until it has started, the
+        # speaker reads them directly (the window itself never produces sound)
+        self.push("notification", message, title)
+        if self.voice is None and get_config().voice.enabled:
+            from app.voice.tts import get_speaker
+
+            threading.Thread(target=lambda: get_speaker().say(f"{title}. {message}"), daemon=True).start()
 
     def push_voice(self, kind: str, text: str) -> None:
         self.push(kind, text)
@@ -143,7 +149,7 @@ async def lifespan(_app):
     st.scheduler.shutdown()
 
 
-app = FastAPI(title="AI Companion", docs_url=None, redoc_url=None, lifespan=lifespan)
+app = FastAPI(title="Lyra", docs_url=None, redoc_url=None, lifespan=lifespan)
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
 
 
@@ -251,8 +257,12 @@ def events(after: int = 0) -> dict:
     from app.runtime import in_call
     from app.voice.voiceprint import get_voiceprint
 
+    voice = st.voice
     return {"events": [e for e in st.events if e["id"] > after],
-            "status": {"wake": wake is not None, "wake_paused": bool(wake and wake.paused),
+            "status": {"phase": getattr(voice, "phase", "idle") if voice else "offline",
+                       "level": round(getattr(voice, "level", 0.0), 3) if voice else 0.0,
+                       "voice_ready": voice is not None,
+                       "wake": wake is not None, "wake_paused": bool(wake and wake.paused),
                        "in_call": in_call.is_set(), "voiceprints": len(get_voiceprint().profiles()),
                        "mouse_reading": bool(st.services and st.services.mouse),
                        "monitor": bool(st.services and st.services.monitor),
@@ -539,7 +549,7 @@ def calls_decide(body: dict) -> dict:
 
 @app.post("/api/listen", dependencies=[Depends(require_token)])
 def listen() -> dict:
-    """Record one utterance with MD's own microphone (the native window has no browser mic)."""
+    """Record one utterance with Lyra's own microphone (the native window has no browser mic)."""
     st = get_state()
     if st.voice is None:
         raise HTTPException(400, "Voice is still starting — try again in a few seconds.")
@@ -552,6 +562,73 @@ def listen() -> dict:
         if wake:
             wake.resume()
     return {"text": text}
+
+
+# ---- voice-first controls -------------------------------------------------------------------------
+
+@app.post("/api/talk", dependencies=[Depends(require_token)])
+def talk() -> dict:
+    """Start a spoken conversation now (same as saying the wake word or pressing the talk hotkey)."""
+    st = get_state()
+    if st.voice is None or st.services is None:
+        raise HTTPException(400, "Voice is still starting — try again in a few seconds.")
+    threading.Thread(target=st.services.talk_hotkey, daemon=True, name="talk").start()
+    return {"ok": True}
+
+
+@app.post("/api/run", dependencies=[Depends(require_token)])
+def run_spoken(body: dict) -> dict:
+    """Run a command as if it had been spoken; the answer is spoken and appears in the window."""
+    text = str(body.get("text", "")).strip()
+    if not text:
+        raise HTTPException(400, "Nothing to run.")
+    st = get_state()
+    if st.voice is None or st.services is None:
+        raise HTTPException(400, "Voice is still starting — try again in a few seconds.")
+    st.services.run_in_background(text)
+    return {"ok": True}
+
+
+@app.post("/api/speak/stop", dependencies=[Depends(require_token)])
+def stop_speaking() -> dict:
+    from app.voice.tts import get_speaker
+
+    get_speaker().stop(interrupt=True)
+    return {"ok": True}
+
+
+@app.get("/api/voices", dependencies=[Depends(require_token)])
+def voices() -> dict:
+    from app.voice import voices as voices_mod
+
+    return voices_mod.catalogue()
+
+
+@app.post("/api/voices/{voice_id}/download", dependencies=[Depends(require_token)])
+def download_voice(voice_id: str) -> dict:
+    from app.voice import voices as voices_mod
+
+    if voice_id not in voices_mod.BY_ID:
+        raise HTTPException(404, "Unknown voice.")
+    voices_mod.downloads.start(voice_id)
+    return voices_mod.catalogue()
+
+
+@app.post("/api/voices/{voice_id}/preview", dependencies=[Depends(require_token)])
+def preview_voice(voice_id: str) -> dict:
+    from app.voice import voices as voices_mod
+    from app.voice.tts import get_speaker
+
+    voice = voices_mod.BY_ID.get(voice_id)
+    if voice is None:
+        raise HTTPException(404, "Unknown voice.")
+    speaker = get_speaker()
+    if not speaker.available:
+        raise HTTPException(400, "Speech isn't available on this computer.")
+    speaker.preview(voice)
+    ready = voices_mod.is_ready(voice)
+    return {"ok": True, "fallback": not ready,
+            "message": "" if ready else f"{voice.name} isn't downloaded yet — this preview uses the Windows voice."}
 
 
 @app.get("/api/startmenu", dependencies=[Depends(require_token)])
