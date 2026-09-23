@@ -2,25 +2,13 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "companion-web",
+      "name": "website",
       "runtimeExecutable": "python",
       "runtimeArgs": [
-        "main.py",
-        "--mode",
-        "web",
-        "--no-browser"
+        "-c",
+        "import os,http.server,functools;http.server.ThreadingHTTPServer(('127.0.0.1',int(os.environ.get('PORT','8000'))),functools.partial(http.server.SimpleHTTPRequestHandler,directory='.')).serve_forever()"
       ],
-      "port": 8765,
-      "url": "http://127.0.0.1:8765"
-    },
-    {
-      "name": "nova-cloud-demo",
-      "runtimeExecutable": "python",
-      "runtimeArgs": [
-        "cloud/dev.py",
-        "--demo"
-      ],
-      "port": 3000,
+      "port": 8000,
       "autoPort": true
     }
   ]

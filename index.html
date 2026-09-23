@@ -6,12 +6,12 @@
   <title>Nova — voice-first AI companion</title>
   <meta name="description" content="Nova is a voice-first personal assistant and IT expert. Chat on the web, or install the desktop app for wake word, memory and hands-free control of your PC.">
   <meta name="theme-color" content="#0d0f14">
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/css/style.css">
   <script>try{var t=localStorage.getItem("nova.theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
-  <a class="skip" href="#composer-input">Skip to chat</a>
+  <a class="skip" href="#top">Skip to content</a>
 
   <header class="topbar">
     <a class="brand" href="#top" aria-label="Nova home">
@@ -19,7 +19,6 @@
       <span>Nova</span>
     </a>
     <nav aria-label="Main">
-      <a href="#chat">Chat</a>
       <a href="#features">Features</a>
       <a href="#download">Download</a>
     </nav>
@@ -35,59 +34,11 @@
       <p class="lede">Chat with Nova here in the browser, or install the desktop app for the wake word,
         hands-free control of your PC, reminders and a memory that stays on your computer.</p>
       <div class="cta-row">
-        <a class="btn primary" href="#chat">Start chatting</a>
         <a class="btn ghost" href="#download">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14"/></svg>
           Download for Windows
         </a>
       </div>
-    </section>
-
-    <section id="chat" class="chat-card" aria-label="Chat with Nova">
-      <div class="chat-head">
-        <div class="status">
-          <span class="dot" id="status-dot" aria-hidden="true"></span>
-          <span id="status-text">Connecting…</span>
-        </div>
-        <div class="tools">
-          <button class="chip" id="memory-btn" type="button" aria-haspopup="dialog">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 0 0-4 10.5V17h8v-3.5A6 6 0 0 0 12 3zM9 21h6"/></svg>
-            Memory <span class="count" id="memory-count">0</span>
-          </button>
-          <button class="chip" id="speak-btn" type="button" aria-pressed="false">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4zm12 0a4 4 0 0 1 0 6"/></svg>
-            Read aloud
-          </button>
-          <button class="chip" id="clear-btn" type="button">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V4h4v3m-7 0 1 13h8l1-13"/></svg>
-            New chat
-          </button>
-        </div>
-      </div>
-
-      <div class="log" id="log" role="log" aria-live="polite" aria-relevant="additions">
-        <div class="empty" id="empty">
-          <p class="empty-title">Assalam-o-Alaikum! How can I help?</p>
-          <div class="suggestions">
-            <button type="button" class="suggestion">My laptop is slow — what should I check first?</button>
-            <button type="button" class="suggestion">Explain Git branches in simple words</button>
-            <button type="button" class="suggestion">Mujhe ek daily routine bana do</button>
-            <button type="button" class="suggestion">Remember that I prefer short answers</button>
-          </div>
-        </div>
-      </div>
-
-      <form class="composer" id="composer" autocomplete="off">
-        <button class="icon-btn mic" id="mic-btn" type="button" aria-label="Speak your message" aria-pressed="false">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
-        </button>
-        <label class="sr-only" for="composer-input">Message</label>
-        <textarea id="composer-input" rows="1" placeholder="Message Nova…  (Enter to send, Shift+Enter for a new line)" maxlength="4000"></textarea>
-        <button class="icon-btn send" id="send-btn" type="submit" aria-label="Send">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13m0 0-5-5m5 5-5 5"/></svg>
-        </button>
-      </form>
-      <p class="fineprint">Your chat and memories are saved only in this browser. Messages are answered by Claude through this site's server.</p>
     </section>
 
     <section id="features" class="features" aria-labelledby="features-title">
@@ -125,33 +76,5 @@
     <span class="muted">Built for people who’d rather talk than type.</span>
   </footer>
 
-  <dialog id="memory-dialog" aria-labelledby="memory-title">
-    <form method="dialog" class="dialog-body" id="memory-form">
-      <h2 id="memory-title">What Nova remembers</h2>
-      <p class="muted">Saved in this browser only and sent with each message so Nova can personalise answers.</p>
-      <ul class="memory-list" id="memory-list"></ul>
-      <div class="memory-add">
-        <label class="sr-only" for="memory-input">New memory</label>
-        <input id="memory-input" placeholder="e.g. I work as a web developer" maxlength="300">
-        <button class="btn primary" type="button" id="memory-add">Add</button>
-      </div>
-      <div class="dialog-actions"><button class="btn ghost" value="close">Done</button></div>
-    </form>
-  </dialog>
-
-  <dialog id="code-dialog" aria-labelledby="code-title">
-    <form method="dialog" class="dialog-body" id="code-form">
-      <h2 id="code-title">Enter access code</h2>
-      <p class="muted">The owner of this site protects the chat with a code. Ask them for it.</p>
-      <label class="sr-only" for="code-input">Access code</label>
-      <input id="code-input" type="password" autocomplete="current-password" required>
-      <div class="dialog-actions">
-        <button class="btn ghost" value="cancel" formnovalidate>Cancel</button>
-        <button class="btn primary" value="ok">Continue</button>
-      </div>
-    </form>
-  </dialog>
-
-  <script src="app.js" defer></script>
 </body>
 </html>
