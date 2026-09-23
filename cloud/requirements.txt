@@ -1,0 +1,3 @@
+# Only what the hosted web chat needs — the desktop app's requirements live in the repo root
+anthropic>=1.8
+fastapi>=0.110

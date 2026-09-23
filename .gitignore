@@ -1,0 +1,28 @@
+# Personal data — memories, conversations, recordings, voice prints, the WebView profile.
+# Never commit this folder: it is created on first run.
+data/
+logs/
+*.db
+*.wav
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/
+
+# Tools and OS
+@AutomationLog.txt
+.vercel/
+.claude/settings.local.json
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

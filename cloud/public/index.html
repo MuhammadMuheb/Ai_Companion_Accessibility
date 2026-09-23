@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nova — voice-first AI companion</title>
+  <meta name="description" content="Nova is a voice-first personal assistant and IT expert. Chat on the web, or install the desktop app for wake word, memory and hands-free control of your PC.">
+  <meta name="theme-color" content="#0d0f14">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <script>try{var t=localStorage.getItem("nova.theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+  <a class="skip" href="#composer-input">Skip to chat</a>
+
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="Nova home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" class="logo-ring"/><path d="M10 22V10l12 12V10" class="logo-n"/></svg>
+      <span>Nova</span>
+    </a>
+    <nav aria-label="Main">
+      <a href="#chat">Chat</a>
+      <a href="#features">Features</a>
+      <a href="#download">Download</a>
+    </nav>
+    <button class="icon-btn" id="theme-btn" type="button" aria-label="Switch light or dark theme">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg>
+    </button>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <p class="eyebrow">Voice-first · Private memory · IT expert</p>
+      <h1>Your personal assistant that listens, remembers and fixes things.</h1>
+      <p class="lede">Chat with Nova here in the browser, or install the desktop app for the wake word,
+        hands-free control of your PC, reminders and a memory that stays on your computer.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="#chat">Start chatting</a>
+        <a class="btn ghost" href="#download">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14"/></svg>
+          Download for Windows
+        </a>
+      </div>
+    </section>
+
+    <section id="chat" class="chat-card" aria-label="Chat with Nova">
+      <div class="chat-head">
+        <div class="status">
+          <span class="dot" id="status-dot" aria-hidden="true"></span>
+          <span id="status-text">Connecting…</span>
+        </div>
+        <div class="tools">
+          <button class="chip" id="memory-btn" type="button" aria-haspopup="dialog">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 0 0-4 10.5V17h8v-3.5A6 6 0 0 0 12 3zM9 21h6"/></svg>
+            Memory <span class="count" id="memory-count">0</span>
+          </button>
+          <button class="chip" id="speak-btn" type="button" aria-pressed="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4zm12 0a4 4 0 0 1 0 6"/></svg>
+            Read aloud
+          </button>
+          <button class="chip" id="clear-btn" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V4h4v3m-7 0 1 13h8l1-13"/></svg>
+            New chat
+          </button>
+        </div>
+      </div>
+
+      <div class="log" id="log" role="log" aria-live="polite" aria-relevant="additions">
+        <div class="empty" id="empty">
+          <p class="empty-title">Assalam-o-Alaikum! How can I help?</p>
+          <div class="suggestions">
+            <button type="button" class="suggestion">My laptop is slow — what should I check first?</button>
+            <button type="button" class="suggestion">Explain Git branches in simple words</button>
+            <button type="button" class="suggestion">Mujhe ek daily routine bana do</button>
+            <button type="button" class="suggestion">Remember that I prefer short answers</button>
+          </div>
+        </div>
+      </div>
+
+      <form class="composer" id="composer" autocomplete="off">
+        <button class="icon-btn mic" id="mic-btn" type="button" aria-label="Speak your message" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+        </button>
+        <label class="sr-only" for="composer-input">Message</label>
+        <textarea id="composer-input" rows="1" placeholder="Message Nova…  (Enter to send, Shift+Enter for a new line)" maxlength="4000"></textarea>
+        <button class="icon-btn send" id="send-btn" type="submit" aria-label="Send">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13m0 0-5-5m5 5-5 5"/></svg>
+        </button>
+      </form>
+      <p class="fineprint">Your chat and memories are saved only in this browser. Messages are answered by Claude through this site's server.</p>
+    </section>
+
+    <section id="features" class="features" aria-labelledby="features-title">
+      <h2 id="features-title">Everything Nova does on your desktop</h2>
+      <div class="grid">
+        <article class="feature"><h3>Wake word, hands-free</h3><p>Say “Hello Nova” from across the room. Nova runs silently in the tray — no window until you ask for one.</p></article>
+        <article class="feature"><h3>Memory that updates itself</h3><p>Tell Nova about your goals and people. When something changes, the old fact is replaced, not duplicated.</p></article>
+        <article class="feature"><h3>Controls your PC</h3><p>Open apps and accounts, search, adjust volume, read the screen aloud and translate text under the mouse.</p></article>
+        <article class="feature"><h3>Reminders &amp; prayer times</h3><p>Morning check-ins, focus sessions, reminders and namaz alerts calculated for your city.</p></article>
+        <article class="feature"><h3>Reads your notifications</h3><p>WhatsApp, Outlook, Teams and unread browser tabs — spoken aloud so you don’t have to look.</p></article>
+        <article class="feature"><h3>Private by default</h3><p>The desktop app runs on a local model with Ollama. Your memory stays in a file on your computer.</p></article>
+      </div>
+    </section>
+
+    <section id="download" class="download" aria-labelledby="download-title">
+      <div class="download-copy">
+        <h2 id="download-title">Install Nova on Windows</h2>
+        <ol class="steps">
+          <li><strong>Download</strong> and unzip Nova anywhere, e.g. <code>Documents\Nova</code>.</li>
+          <li><strong>Right-click</strong> <code>install.ps1</code> → <em>Run with PowerShell</em>. It installs the Python packages and the local AI models.</li>
+          <li><strong>Say “Hello Nova”.</strong> Nova starts with Windows and waits quietly in the tray.</li>
+        </ol>
+        <p class="req">Needs Windows 10/11, <a href="https://www.python.org/downloads/" rel="noopener">Python 3.10–3.13</a>, <a href="https://ollama.com/download" rel="noopener">Ollama</a> and about 6 GB of free disk space.</p>
+      </div>
+      <div class="download-box">
+        <svg viewBox="0 0 24 24" aria-hidden="true" class="big-icon"><path d="M3 5l8-1.2V11H3zm0 14 8 1.2V13H3zm9-15.4L21 2v9h-9zM12 20.4 21 22v-9h-9z"/></svg>
+        <a class="btn primary wide" id="download-btn" href="#download">Download for Windows</a>
+        <p class="muted" id="download-note">Free · open source · runs offline</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>Nova</span>
+    <span class="muted">Built for people who’d rather talk than type.</span>
+  </footer>
+
+  <dialog id="memory-dialog" aria-labelledby="memory-title">
+    <form method="dialog" class="dialog-body" id="memory-form">
+      <h2 id="memory-title">What Nova remembers</h2>
+      <p class="muted">Saved in this browser only and sent with each message so Nova can personalise answers.</p>
+      <ul class="memory-list" id="memory-list"></ul>
+      <div class="memory-add">
+        <label class="sr-only" for="memory-input">New memory</label>
+        <input id="memory-input" placeholder="e.g. I work as a web developer" maxlength="300">
+        <button class="btn primary" type="button" id="memory-add">Add</button>
+      </div>
+      <div class="dialog-actions"><button class="btn ghost" value="close">Done</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="code-dialog" aria-labelledby="code-title">
+    <form method="dialog" class="dialog-body" id="code-form">
+      <h2 id="code-title">Enter access code</h2>
+      <p class="muted">The owner of this site protects the chat with a code. Ask them for it.</p>
+      <label class="sr-only" for="code-input">Access code</label>
+      <input id="code-input" type="password" autocomplete="current-password" required>
+      <div class="dialog-actions">
+        <button class="btn ghost" value="cancel" formnovalidate>Cancel</button>
+        <button class="btn primary" value="ok">Continue</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js" defer></script>
+</body>
+</html>

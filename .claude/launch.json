@@ -1,0 +1,27 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "companion-web",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "main.py",
+        "--mode",
+        "web",
+        "--no-browser"
+      ],
+      "port": 8765,
+      "url": "http://127.0.0.1:8765"
+    },
+    {
+      "name": "nova-cloud-demo",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "cloud/dev.py",
+        "--demo"
+      ],
+      "port": 3000,
+      "autoPort": true
+    }
+  ]
+}
