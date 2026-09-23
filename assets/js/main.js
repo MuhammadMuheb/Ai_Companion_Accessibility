@@ -38,7 +38,7 @@ $("#theme-btn").addEventListener("click", () => {
   const root = document.documentElement;
   const isLight = root.dataset.theme ? root.dataset.theme === "light" : matchMedia("(prefers-color-scheme: light)").matches;
   root.dataset.theme = isLight ? "dark" : "light";
-  try { localStorage.setItem("nova.theme", root.dataset.theme); } catch { /* storage blocked */ }
+  try { localStorage.setItem("md.theme", root.dataset.theme); } catch { /* storage blocked */ }
 });
 
 /* ---------- reveal + counters ---------- */
@@ -94,19 +94,19 @@ const waveBars = $$("i", wave);
 /* ---------- hero: looping voice session ---------- */
 const SESSIONS = [
   [
-    { who: "you", text: "Hello Nova, open Gmail on my work account." },
+    { who: "you", text: "Hey MD, open Gmail on my work account." },
     { who: "sys", text: "open → gmail · profile “Work”" },
-    { who: "nova", text: "Opening Gmail in your Work profile. You have 3 unread emails." },
+    { who: "ai", text: "Opening Gmail in your Work profile. You have 3 unread emails." },
   ],
   [
     { who: "you", text: "Remind me in 20 minutes to call Ammi." },
     { who: "sys", text: "reminder · 20 min · “call Ammi”" },
-    { who: "nova", text: "Done — I’ll remind you at 4:35 to call Ammi." },
+    { who: "ai", text: "Done — I’ll remind you at 4:35 to call Ammi." },
   ],
   [
     { who: "you", text: "Namaz kab hai?" },
     { who: "sys", text: "prayer times · Karachi · Hanafi" },
-    { who: "nova", text: "Asr 4:39 par hai — 22 minute baqi hain. 10 minute pehle reminder aa jayega." },
+    { who: "ai", text: "Asr 4:39 par hai — 22 minute baqi hain. 10 minute pehle reminder aa jayega." },
   ],
 ];
 const transcript = $("#transcript");
@@ -160,7 +160,7 @@ async function runSessions() {
         await sleep(700);
       } else {
         orb.classList.add("speaking"); orbState.textContent = "Speaking…"; animateWave(55);
-        const li = addLine({ who: "nova", text: "" });
+        const li = addLine({ who: "ai", text: "" });
         await typeInto(li, line.text);
         await sleep(1400);
         animateWave(0); orb.classList.remove("speaking"); orbState.textContent = "Listening…";
@@ -219,16 +219,16 @@ const COMMANDS = [
 const tabsEl = $("#cmd-tabs");
 const listEl = $("#cmd-list");
 const prevYou = $("#prev-you");
-const prevNova = $("#prev-nova");
+const prevAI = $("#prev-ai");
 const prevMeta = $("#prev-meta");
 
 function showCommand(item, btn) {
   $$(".cmd", listEl).forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
   prevYou.textContent = "“" + item.say + "”";
-  prevNova.textContent = item.reply;
+  prevAI.textContent = item.reply;
   prevMeta.innerHTML = "";
   item.meta.forEach((m) => { const s = document.createElement("span"); s.textContent = m; prevMeta.appendChild(s); });
-  [prevYou.parentElement, prevNova.parentElement].forEach((b) => { b.style.animation = "none"; void b.offsetWidth; b.style.animation = ""; });
+  [prevYou.parentElement, prevAI.parentElement].forEach((b) => { b.style.animation = "none"; void b.offsetWidth; b.style.animation = ""; });
 }
 
 function showCategory(cat) {
@@ -330,23 +330,22 @@ function highlight(code, lang) {
 
 const DOCS = {
   install: {
-    file: "PowerShell", lang: "sh",
-    note: "The installer only adds what’s missing, so it’s safe to run again after an update.",
-    code: `# 1. Unzip Nova, then from its folder:
-PS> .\\install.ps1
+    file: "Setup", lang: "sh",
+    note: "Installs per user into %LOCALAPPDATA%\\Programs\\MD. Your data lives in %LOCALAPPDATA%\\MD and survives updates.",
+    code: `# 1. Install Ollama (runs the AI models on your PC)
+https://ollama.com/download
 
-# or step by step
-PS> pip install -r requirements-FULL.txt
-PS> ollama pull qwen2.5:1.5b
-PS> ollama pull nomic-embed-text
-PS> ollama pull gemma3:4b
+# 2. Run the installer and follow the wizard
+MD-Setup-1.0.0.exe
 
-# start invisibly in the tray, then say "Hello Nova"
-PS> pythonw nova.pyw`,
+# optional: silent install for IT admins
+PS> .\MD-Setup-1.0.0.exe /VERYSILENT /TASKS="autostart,models"
+
+# models again later: Start menu > "MD - Download AI models"`,
   },
   check: {
-    file: "PowerShell", lang: "sh",
-    note: "Run the check any time something seems off — or just ask Nova to “check yourself”.",
+    file: "PowerShell · from source", lang: "sh",
+    note: "Installed users can simply say “check yourself”. Developers running from source can use the command above.",
     code: `PS> python main.py --check
 ✓ Ollama running at http://localhost:11434
 ✓ Model qwen2.5:1.5b (chat)
@@ -362,7 +361,7 @@ PS> pythonw nova.pyw`,
     file: "config.yaml", lang: "yaml",
     note: "Changes made by voice or on the settings page are saved to data/settings.yaml and override this file.",
     code: `assistant:
-  name: "Nova"             # the wake word follows the name
+  name: "MD"             # the wake word follows the name
 
 llm:
   chat_model: "qwen2.5:1.5b"
@@ -383,7 +382,7 @@ scheduler:
   },
   routines: {
     file: "config.yaml", lang: "yaml",
-    note: "Say the routine’s name and Nova runs every step in order.",
+    note: "Say the routine’s name and MD runs every step in order.",
     code: `routines:
   work mode:
     - open vs code
@@ -399,12 +398,12 @@ focus:
   },
   hotkeys: {
     file: "config.yaml", lang: "yaml",
-    note: "Hotkeys work from any app, even when Nova’s window is closed.",
+    note: "Hotkeys work from any app, even when MD’s window is closed.",
     code: `hotkeys:
   enabled: true
   talk: "<ctrl>+<alt>+<space>"    # talk without the wake word
   translate: "<ctrl>+<alt>+t"     # selected text -> Roman Urdu
-  open_window: "<ctrl>+<alt>+n"   # open Nova's window`,
+  open_window: "<ctrl>+<alt>+n"   # open MD's window`,
   },
 };
 

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Nova — landing page
+   MD — landing page
    ========================================================================== */
 
 :root {
@@ -133,7 +133,7 @@ svg.fill { fill: currentColor; stroke: none; }
 }
 .nav-inner { max-width: 1200px; height: 100%; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; gap: 32px; }
 .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; letter-spacing: -.02em; text-decoration: none; color: var(--text); }
-.brand-mark { width: 30px; height: 30px; }
+.brand-mark { width: 34px; height: 34px; border-radius: 10px; box-shadow: 0 6px 18px -6px var(--glow-violet); }
 .nav-links { display: flex; gap: 4px; }
 .nav-links a { padding: 8px 12px; border-radius: 9px; color: var(--text-2); text-decoration: none; font-size: 14.5px; font-weight: 500; transition: color .2s, background .2s; }
 .nav-links a:hover, .nav-links a.active { color: var(--text); background: var(--surface-strong); }
@@ -204,7 +204,7 @@ svg.fill { fill: currentColor; stroke: none; }
 .transcript { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; justify-content: flex-end; }
 .transcript li { padding: 10px 14px; border-radius: 14px; font-size: 14.5px; line-height: 1.5; animation: pop .35s ease both; max-width: 100%; }
 .transcript .you { align-self: flex-end; background: linear-gradient(135deg, #8b7dff, #6a5cff); color: #fff; border-bottom-right-radius: 5px; }
-.transcript .nova { align-self: flex-start; background: var(--surface-strong); border: 1px solid var(--border); border-bottom-left-radius: 5px; }
+.transcript .ai { align-self: flex-start; background: var(--surface-strong); border: 1px solid var(--border); border-bottom-left-radius: 5px; }
 .transcript .sys { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; font-size: 12.5px; color: var(--muted); font-family: var(--mono); border: 1px dashed var(--border-strong); }
 .transcript .sys svg { width: 14px; height: 14px; color: var(--ok); }
 @keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.98); } }
@@ -348,7 +348,7 @@ svg.fill { fill: currentColor; stroke: none; }
 .bubble { max-width: 92%; padding: 14px 16px; border-radius: 16px; animation: pop .3s ease both; }
 .bubble .who { display: block; margin-bottom: 4px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; opacity: .75; }
 .bubble.you { align-self: flex-end; color: #fff; background: linear-gradient(135deg, #8b7dff, #6a5cff); border-bottom-right-radius: 5px; }
-.bubble.nova { align-self: flex-start; background: var(--surface-strong); border: 1px solid var(--border); border-bottom-left-radius: 5px; }
+.bubble.ai { align-self: flex-start; background: var(--surface-strong); border: 1px solid var(--border); border-bottom-left-radius: 5px; }
 .cmd-meta { margin-top: auto; display: flex; flex-wrap: wrap; gap: 8px; }
 .cmd-meta span { padding: 4px 10px; border-radius: 8px; font: 500 12px var(--mono); color: var(--text-2); background: var(--surface-strong); border: 1px solid var(--border); }
 
@@ -428,8 +428,9 @@ svg.fill { fill: currentColor; stroke: none; }
 .steps p { color: var(--text-2); font-size: 15px; }
 .steps a { color: var(--violet); text-underline-offset: 3px; }
 .download-card { position: relative; z-index: 1; align-self: center; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 36px 30px; text-align: center; border-radius: 20px; background: var(--bg-2); border: 1px solid var(--border-strong); }
-.win-logo { width: 54px; height: 54px; fill: url(#bm); stroke: none; margin-bottom: 6px; }
-.win-logo path { fill: var(--violet); }
+.dl-logo { width: 72px; height: 72px; margin-bottom: 6px; filter: drop-shadow(0 12px 28px var(--glow-violet)); }
+.dl-hash span { display: block; margin-bottom: 2px; font-weight: 600; letter-spacing: .06em; color: var(--text-2); }
+.dl-hash { margin-top: 6px; max-width: 100%; font: 11px/1.5 var(--mono); color: var(--muted); word-break: break-all; }
 .dl-title { font-size: 20px; font-weight: 700; }
 .download-card .btn-primary { margin-top: 10px; }
 .dl-facts { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 16px; font-size: 13px; color: var(--muted); }
@@ -475,7 +476,7 @@ svg.fill { fill: currentColor; stroke: none; }
   .card.span-2 { grid-template-columns: 1fr; }
   .pipeline { grid-template-columns: repeat(2, 1fr); }
   .pipeline::before { display: none; }
-  .arch, .split, .specs, .download { grid-template-columns: 1fr; }
+  .arch, .split, .specs, .download { grid-template-columns: minmax(0, 1fr); }
   .chip-b { left: -8px; }
 }
 @media (max-width: 920px) {
@@ -528,6 +529,8 @@ svg.fill { fill: currentColor; stroke: none; }
   .bench-row { grid-template-columns: 1fr 42px; }
   .bench-row .bar-track { grid-column: 1 / -1; grid-row: 2; }
   .download { padding: 26px 20px; }
+  .btn { white-space: normal; text-align: center; }
+  .download-card { padding: 28px 18px; }
   .req-grid { grid-template-columns: 1fr; }
   .cta-card { padding: 48px 20px; }
   .footer-grid { grid-template-columns: 1fr; }

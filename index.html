@@ -3,17 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nova — voice-first AI assistant for Windows</title>
-  <meta name="description" content="Nova is a voice-first AI assistant for Windows that runs on your own PC: wake word, private memory, PC control, reminders, prayer times and notifications read aloud — all with a local model.">
+  <title>MD — voice-first AI assistant for Windows</title>
+  <meta name="description" content="MD is a voice-first AI assistant for Windows that runs on your own PC: wake word, private memory, PC control, reminders, prayer times and notifications read aloud — all with a local model.">
   <meta name="theme-color" content="#07080d">
-  <meta property="og:title" content="Nova — voice-first AI assistant for Windows">
-  <meta property="og:description" content="Say “Hello Nova”. A private, local AI assistant that listens, remembers and controls your PC.">
-  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="MD — voice-first AI assistant for Windows">
+  <meta property="og:description" content="Say “Hey MD”. A private, local AI assistant that listens, remembers and controls your PC.">
+  <link rel="icon" href="/assets/img/md-logo.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/img/md-512.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="/assets/css/style.css">
-  <script>try{var t=localStorage.getItem("nova.theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script>try{var t=localStorage.getItem("md.theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -21,12 +22,9 @@
   <!-- ================= NAV ================= -->
   <header class="nav" id="nav">
     <div class="nav-inner">
-      <a class="brand" href="#top" aria-label="Nova home">
-        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
-          <defs><linearGradient id="bm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b7dff"/><stop offset="1" stop-color="#3ee6d3"/></linearGradient></defs>
-          <rect width="32" height="32" rx="9" fill="url(#bm)"/><path d="M10 22V10l12 12V10" fill="none" stroke="#07080d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <span>Nova</span>
+      <a class="brand" href="#top" aria-label="MD home">
+        <img class="brand-mark" src="/assets/img/md-logo.svg" width="34" height="34" alt="">
+        <span>MD</span>
       </a>
       <nav class="nav-links" id="nav-links" aria-label="Main">
         <a href="#features">Features</a>
@@ -41,7 +39,7 @@
         <button class="icon-btn" id="theme-btn" type="button" aria-label="Switch light or dark theme">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
         </button>
-        <a class="icon-btn" href="https://github.com/MuhammadMuheb/Ai_Companion_Accessibility" rel="noopener" aria-label="Nova on GitHub">
+        <a class="icon-btn" href="https://github.com/MuhammadMuheb/Ai_Companion_Accessibility" rel="noopener" aria-label="MD on GitHub">
           <svg viewBox="0 0 24 24" aria-hidden="true" class="fill"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.26 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>
         </a>
         <a class="btn btn-primary btn-sm nav-cta" href="#download">Download</a>
@@ -61,12 +59,12 @@
       </div>
       <div class="container hero-inner">
         <div class="hero-copy">
-          <a class="pill" href="#specs">
-            <span class="pill-tag">New</span> Faster on CPU-only laptops — first word in about a second
+          <a class="pill" href="#download">
+            <span class="pill-tag">New</span> MD 1.0 for Windows — one-click installer
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
           </a>
           <h1>The AI assistant that <span class="grad">listens, remembers</span> and runs your PC.</h1>
-          <p class="lede">Say <strong>“Hello Nova”</strong> from across the room. Nova opens apps, reads your
+          <p class="lede">Say <strong>“Hey MD”</strong> from across the room. MD opens apps, reads your
             notifications, reminds you of prayers and meetings, and remembers what matters — running
             entirely on your own Windows computer.</p>
           <div class="cta-row">
@@ -87,13 +85,13 @@
         </div>
 
         <!-- Interactive mockup: a live voice session -->
-        <div class="hero-visual" role="img" aria-label="Animated example: the user says Hello Nova, open Gmail on my work account, and Nova opens it and replies.">
+        <div class="hero-visual" role="img" aria-label="Animated example: the user says Hey MD, open Gmail on my work account, and MD opens it and replies.">
           <div class="float-chip chip-a" aria-hidden="true"><span class="dot ok"></span>Wake word heard · 0.9 s</div>
           <div class="float-chip chip-b" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-4 10.5V17h8v-3.5A6 6 0 0 0 12 3zM9 21h6"/></svg>Memory updated</div>
           <div class="window glass">
             <div class="window-bar">
               <span class="lights"><i></i><i></i><i></i></span>
-              <span class="window-title">Nova — listening</span>
+              <span class="window-title">MD — listening</span>
               <span class="kbd">Ctrl Alt Space</span>
             </div>
             <div class="session">
@@ -129,7 +127,7 @@
         <header class="section-head reveal">
           <p class="eyebrow">Features</p>
           <h2>Everything a personal assistant should do — without the cloud.</h2>
-          <p class="section-lede">Nova lives in the system tray, stays silent until you call it, and works by voice from
+          <p class="section-lede">MD lives in the system tray, stays silent until you call it, and works by voice from
             start to finish: settings, goals and memories included.</p>
         </header>
 
@@ -138,20 +136,20 @@
             <div class="card-copy">
               <span class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3zM19 11a7 7 0 0 1-14 0M12 18v4"/></svg></span>
               <h3>Wake word, fully hands-free</h3>
-              <p>A light speech model listens for “Hello Nova” all day using a fraction of the CPU. The accurate model
-                only starts once it hears its name. Keep talking — Nova follows up until you say “bye” or “bas”.</p>
+              <p>A light speech model listens for “Hey MD” all day using a fraction of the CPU. The accurate model
+                only starts once it hears its name. Keep talking — MD follows up until you say “bye” or “bas”.</p>
               <ul class="ticks"><li>Voice print: only your enrolled voices can wake it</li><li>Push-to-talk hotkey as a backup</li><li>Adjustable sensitivity, custom wake names</li></ul>
             </div>
             <div class="viz viz-wave" aria-hidden="true">
               <div class="bars" id="feature-bars"></div>
-              <div class="viz-label"><span class="dot ok"></span>“Hello Nova” · confidence 0.91</div>
+              <div class="viz-label"><span class="dot ok"></span>“Hey MD” · confidence 0.91</div>
             </div>
           </article>
 
           <article class="card glass reveal">
             <span class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-4 10.5V17h8v-3.5A6 6 0 0 0 12 3zM9 21h6"/></svg></span>
             <h3>Memory that updates itself</h3>
-            <p>Tell Nova you moved or changed jobs — the old fact is replaced, not duplicated, and the change is kept in a history.</p>
+            <p>Tell MD you moved or changed jobs — the old fact is replaced, not duplicated, and the change is kept in a history.</p>
             <div class="mini-diff" aria-hidden="true">
               <div class="del">− User is travelling to Dubai</div>
               <div class="add">+ User is travelling to London</div>
@@ -202,7 +200,7 @@
           <article class="card glass reveal">
             <span class="card-icon"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 1-13.5 7.8L3 21l1.2-4.5A9 9 0 1 1 21 12z"/></svg></span>
             <h3>WhatsApp by voice</h3>
-            <p>“Send Mama Ji: I’ll be late.” Nova checks the open chat’s name on screen before pressing send.</p>
+            <p>“Send Mama Ji: I’ll be late.” MD checks the open chat’s name on screen before pressing send.</p>
           </article>
 
           <article class="card glass reveal">
@@ -245,7 +243,7 @@
           <li class="stage glass reveal">
             <span class="stage-num">04</span>
             <h3>Act &amp; speak</h3>
-            <p>Nova runs the action and speaks the reply sentence by sentence, so you hear the first words right away.</p>
+            <p>MD runs the action and speaks the reply sentence by sentence, so you hear the first words right away.</p>
             <span class="stage-meta">Windows SAPI voices</span>
           </li>
         </ol>
@@ -263,7 +261,7 @@
           </div>
           <div class="arch-diagram" aria-hidden="true">
             <div class="node n-mic">Microphone</div>
-            <div class="node n-core"><b>Nova core</b><small>tray · scheduler · services</small></div>
+            <div class="node n-core"><b>MD core</b><small>tray · scheduler · services</small></div>
             <div class="node n-llm">Ollama<small>chat · embeddings</small></div>
             <div class="node n-db">SQLite<small>memory · history</small></div>
             <div class="node n-os">Windows<small>apps · OCR · toasts</small></div>
@@ -283,8 +281,8 @@
       <div class="container">
         <header class="section-head reveal">
           <p class="eyebrow">Voice commands</p>
-          <h2>Talk naturally. Nova understands what you mean.</h2>
-          <p class="section-lede">Pick a category to see real commands and Nova’s spoken replies.</p>
+          <h2>Talk naturally. MD understands what you mean.</h2>
+          <p class="section-lede">Pick a category to see real commands and MD’s spoken replies.</p>
         </header>
 
         <div class="explorer glass reveal">
@@ -293,7 +291,7 @@
             <ul class="cmd-list" id="cmd-list" role="tabpanel"></ul>
             <div class="cmd-preview" aria-live="polite">
               <div class="bubble you"><span class="who">You</span><p id="prev-you"></p></div>
-              <div class="bubble nova"><span class="who">Nova</span><p id="prev-nova"></p></div>
+              <div class="bubble ai"><span class="who">MD</span><p id="prev-ai"></p></div>
               <div class="cmd-meta" id="prev-meta"></div>
             </div>
           </div>
@@ -307,12 +305,12 @@
         <div class="split-copy reveal">
           <p class="eyebrow">Memory</p>
           <h2>It remembers you — and keeps up when life changes.</h2>
-          <p class="section-lede">Nova picks out long-term facts from what you say: your name, family, work, goals and routines.
+          <p class="section-lede">MD picks out long-term facts from what you say: your name, family, work, goals and routines.
             When something changes, it updates the old memory instead of piling up contradictions.</p>
           <ul class="ticks">
             <li>“What do you remember about me?” — reads it all back</li>
             <li>“Forget that I live in Lahore” — removed immediately</li>
-            <li>Goals you mention become goals Nova checks in on</li>
+            <li>Goals you mention become goals MD checks in on</li>
             <li>Stored locally in <code>data/memory.db</code>, with a change history</li>
           </ul>
         </div>
@@ -383,7 +381,7 @@
           <div class="spec-table glass reveal">
             <h3>Stack</h3>
             <dl>
-              <div><dt>Runtime</dt><dd>Python 3.10 – 3.13</dd></div>
+              <div><dt>Runtime</dt><dd>Bundled — no Python needed (source: Python 3.10 – 3.13)</dd></div>
               <div><dt>Chat model</dt><dd>qwen2.5:1.5b via Ollama</dd></div>
               <div><dt>Memory search</dt><dd>nomic-embed-text + keyword fallback</dd></div>
               <div><dt>Translation</dt><dd>gemma3:4b (English → Roman Urdu)</dd></div>
@@ -408,7 +406,7 @@
             <ul class="req-grid">
               <li><b>OS</b>Windows 10 or 11</li>
               <li><b>Memory</b>8 GB RAM (16 GB for translation)</li>
-              <li><b>Disk</b>~6 GB for models</li>
+              <li><b>Disk</b>~1 GB app + ~4.5 GB models</li>
               <li><b>Audio</b>Any microphone &amp; speakers</li>
             </ul>
           </div>
@@ -423,42 +421,43 @@
           <div class="download-glow" aria-hidden="true"></div>
           <div class="download-copy">
             <p class="eyebrow">Install</p>
-            <h2>Install Nova on Windows</h2>
+            <h2>Install MD on Windows</h2>
             <ol class="steps">
               <li>
                 <span class="step-dot">1</span>
-                <div><h3>Install the prerequisites</h3>
-                  <p><a href="https://www.python.org/downloads/" rel="noopener">Python 3.10–3.13</a> (tick “Add python.exe to PATH”) and <a href="https://ollama.com/download" rel="noopener">Ollama</a>.</p></div>
+                <div><h3>Get Ollama</h3>
+                  <p>MD runs its AI on your PC with <a href="https://ollama.com/download" rel="noopener">Ollama</a> — free, one click to install.</p></div>
               </li>
               <li>
                 <span class="step-dot">2</span>
-                <div><h3>Download &amp; unzip Nova</h3>
-                  <p>Put the folder anywhere, for example <code>Documents\Nova</code>.</p></div>
+                <div><h3>Download MD-Setup.exe</h3>
+                  <p>One installer with everything included — no Python, no command line.</p></div>
               </li>
               <li>
                 <span class="step-dot">3</span>
-                <div><h3>Run the installer</h3>
-                  <p>Right-click <code>install.ps1</code> → <em>Run with PowerShell</em>. It installs packages, downloads the three local models and adds Nova to the Start menu.</p></div>
+                <div><h3>Run the setup wizard</h3>
+                  <p>No administrator rights needed. Choose shortcuts and “Start with Windows”, and let it download the AI models.</p></div>
               </li>
               <li>
                 <span class="step-dot">4</span>
-                <div><h3>Say “Hello Nova”</h3>
-                  <p>Nova starts with Windows and waits quietly in the tray. Press <span class="kbd">Ctrl Alt N</span> to open its window.</p></div>
+                <div><h3>Say “Hey MD”</h3>
+                  <p>MD waits quietly in the tray. Press <span class="kbd">Ctrl Alt N</span> to open its window.</p></div>
               </li>
             </ol>
           </div>
           <div class="download-card">
-            <svg viewBox="0 0 24 24" aria-hidden="true" class="win-logo"><path d="M3 5.5l7.5-1v7H3zm0 13 7.5 1v-7H3zM11.5 4.3 21 3v8.5h-9.5zm0 15.4L21 21v-8.5h-9.5z"/></svg>
-            <p class="dl-title">Nova for Windows</p>
-            <p class="muted small">Source package · includes <code>install.ps1</code></p>
-            <a class="btn btn-primary btn-lg wide" href="https://github.com/MuhammadMuheb/Ai_Companion_Accessibility/archive/dee18cc.zip" download>
+            <img src="/assets/img/md-logo.svg" width="72" height="72" alt="" class="dl-logo">
+            <p class="dl-title">MD for Windows</p>
+            <p class="muted small" id="dl-meta">Version 1.0.0 · 64-bit · 295 MB · Windows 10 / 11</p>
+            <a class="btn btn-primary btn-lg wide" id="dl-btn" href="https://github.com/MuhammadMuheb/Ai_Companion_Accessibility/releases/download/v1.0.0/MD-Setup-1.0.0.exe">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14"/></svg>
-              Download .zip
+              Download MD-Setup.exe
             </a>
-            <a class="btn btn-glass wide" href="https://github.com/MuhammadMuheb/Ai_Companion_Accessibility/tree/dee18cc" rel="noopener">View source on GitHub</a>
+            <a class="btn btn-glass wide" href="https://github.com/MuhammadMuheb/Ai_Companion_Accessibility" rel="noopener">View source on GitHub</a>
             <ul class="dl-facts">
-              <li>Free &amp; open source</li><li>No account needed</li><li>Works offline</li>
+              <li>Free &amp; open source</li><li>No admin rights</li><li>Clean uninstall</li>
             </ul>
+            <p class="dl-hash" id="dl-hash"><span>SHA-256</span> B1D9366FAF7CC0A194CB3EF1B7FD25D214E2D6AE00859BABB0C7B0B01E279AA3</p>
           </div>
         </div>
       </div>
@@ -472,19 +471,23 @@
           <h2>Questions, answered.</h2>
         </header>
         <div class="faq reveal">
-          <details><summary>Does Nova send my voice or data to the internet?</summary>
+          <details><summary>Does MD send my voice or data to the internet?</summary>
             <p>No. Speech recognition, the chat model, memory and screen reading all run on your computer. Web searches go
               out only when you ask for one, and the optional expert mode uses Claude only with your own API key and a weekly budget you set.</p></details>
           <details><summary>Do I need a graphics card?</summary>
-            <p>No. Nova is tuned for CPU-only laptops. A GPU or a newer CPU simply makes replies faster.</p></details>
+            <p>No. MD is tuned for CPU-only laptops. A GPU or a newer CPU simply makes replies faster.</p></details>
           <details><summary>Which languages does it understand?</summary>
             <p>English, Urdu, Hindi and Roman Urdu. Replies come back in the language you speak, and English text can be translated into Roman Urdu with one hotkey.</p></details>
           <details><summary>Can it be used with a screen reader?</summary>
-            <p>Yes. Nova’s window is a standard web page inside WebView2, so screen readers can read every control. Most people never open it: everything works by voice.</p></details>
+            <p>Yes. MD’s window is a standard web page inside WebView2, so screen readers can read every control. Most people never open it: everything works by voice.</p></details>
           <details><summary>What happens when my PC is locked?</summary>
             <p>Only safe commands run — like the time, reminders or reading notifications. Anything that opens apps or sends messages waits until you unlock.</p></details>
+          <details><summary>Windows says “Windows protected your PC”. Is it safe?</summary>
+            <p>MD isn’t code-signed yet, so SmartScreen warns about every new download. Click <em>More info</em> → <em>Run anyway</em>. To be sure the file is genuine, compare its SHA-256 (shown under the download button) with <code>Get-FileHash MD-Setup-1.0.0.exe</code> in PowerShell.</p></details>
+          <details><summary>How do I uninstall MD?</summary>
+            <p>Windows Settings → Apps → MD → Uninstall, or “Uninstall MD” in the Start menu. The uninstaller asks whether to keep your memories and settings.</p></details>
           <details><summary>How do I stop it from starting with Windows?</summary>
-            <p>Switch off “Start with Windows” on Nova’s settings page. You can also quit it from the tray icon at any time.</p></details>
+            <p>Switch off “Start with Windows” on MD’s settings page. You can also quit it from the tray icon at any time.</p></details>
         </div>
       </div>
     </section>
@@ -494,7 +497,7 @@
       <div class="container">
         <div class="cta-card glass reveal">
           <h2>Your PC, finally listening.</h2>
-          <p>Download Nova, say its name, and get your hands and eyes back.</p>
+          <p>Download MD, say its name, and get your hands and eyes back.</p>
           <div class="cta-row center">
             <a class="btn btn-primary btn-lg" href="#download">Download for Windows</a>
             <a class="btn btn-glass btn-lg" href="#docs">Read the docs</a>
@@ -508,14 +511,14 @@
   <footer class="footer">
     <div class="container footer-grid">
       <div class="footer-brand">
-        <a class="brand" href="#top"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="url(#bm)"/><path d="M10 22V10l12 12V10" fill="none" stroke="#07080d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Nova</span></a>
+        <a class="brand" href="#top"><img class="brand-mark" src="/assets/img/md-logo.svg" width="34" height="34" alt=""><span>MD</span></a>
         <p class="muted">A voice-first, private AI assistant for Windows. Built for people who’d rather talk than type.</p>
       </div>
       <nav aria-label="Product"><h3>Product</h3><a href="#features">Features</a><a href="#how">How it works</a><a href="#commands">Commands</a><a href="#download">Download</a></nav>
       <nav aria-label="Resources"><h3>Resources</h3><a href="#docs">Documentation</a><a href="#specs">Specs</a><a href="#faq">FAQ</a></nav>
       <nav aria-label="Project"><h3>Project</h3><a href="https://github.com/MuhammadMuheb/Ai_Companion_Accessibility" rel="noopener">GitHub</a><a href="https://ollama.com" rel="noopener">Ollama</a></nav>
     </div>
-    <div class="container footer-bottom"><span class="muted">© <span id="year">2026</span> Nova</span><span class="muted">Made with care for accessibility.</span></div>
+    <div class="container footer-bottom"><span class="muted">© <span id="year">2026</span> MD</span><span class="muted">Made with care for accessibility.</span></div>
   </footer>
 
   <script src="/assets/js/main.js" defer></script>

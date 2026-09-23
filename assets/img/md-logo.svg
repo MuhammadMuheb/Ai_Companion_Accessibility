@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="MD">
+  <defs>
+    <linearGradient id="md-bg" x1="6" y1="4" x2="60" y2="62" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#a99cff"/>
+      <stop offset=".45" stop-color="#7b6cff"/>
+      <stop offset="1" stop-color="#2fd4c4"/>
+    </linearGradient>
+    <linearGradient id="md-shine" x1="32" y1="0" x2="32" y2="34" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="17" fill="url(#md-bg)"/>
+  <rect x="1" y="1" width="62" height="62" rx="16" fill="url(#md-shine)"/>
+  <!-- M and D share one stem: the M's right leg is the D's spine -->
+  <path d="M12 45V19l10.5 15L33 19v26M33 19h5.5a13 13 0 0 1 0 26H33" fill="none" stroke="#0a0b12" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="51.5" cy="14.5" r="3" fill="#0a0b12"/>
+</svg>

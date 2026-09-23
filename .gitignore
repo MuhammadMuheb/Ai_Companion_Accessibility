@@ -26,3 +26,11 @@ venv/
 Thumbs.db
 .idea/
 .vscode/
+
+# Desktop build output and bundled models (large; the installer goes to GitHub Releases)
+desktop/packaging/build/
+desktop/packaging/dist/
+desktop/packaging/Output/
+desktop/packaging/models/
+desktop/packaging/*.log
+downloads/
